@@ -26,7 +26,7 @@ export default function Loader() {
       /* ignore */
     }
     lockScroll(true);
-    const t0 = performance.now(), dur = 900;
+    const t0 = performance.now(), dur = 650;
     let frame = requestAnimationFrame(function step(t) {
       const k = Math.min(1, (t - t0) / dur);
       setN(Math.round(100 * (1 - Math.pow(1 - k, 3))));
@@ -42,7 +42,7 @@ export default function Loader() {
     const id = window.setTimeout(() => {
       lockScroll(false);
       setState("off");
-    }, 750);
+    }, 650);
     return () => window.clearTimeout(id);
   }, [state]);
 

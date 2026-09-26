@@ -13,7 +13,7 @@
   background: var(--bottle);
   color: var(--cream);
   clip-path: inset(0 0 0 0);
-  transition: clip-path 0.75s cubic-bezier(0.76, 0, 0.24, 1);
+  transition: clip-path 0.65s cubic-bezier(0.76, 0, 0.24, 1);
 }
 .loader.is-lifting {
   clip-path: inset(0 0 100% 0);
@@ -466,10 +466,16 @@
   will-change: transform;
 }
 .hgallery.is-pinned {
-  height: 100svh;
+  padding: 0;
+  overflow: visible;
+}
+.hgallery.is-pinned .hg-stage {
+  position: sticky;
+  top: 0;
+  height: 100vh;
   display: flex;
   align-items: center;
-  padding: 0;
+  overflow: hidden;
 }
 .hg-panel {
   position: relative;
@@ -1149,4 +1155,12 @@
 }
 .cake-card.tone-blue .eyebrow {
   color: var(--brass-soft);
+}
+
+/* layers that move every frame get their own compositor layer */
+.show-word,
+.show-hero,
+.show-steps,
+.show-canvas {
+  will-change: transform, opacity;
 }

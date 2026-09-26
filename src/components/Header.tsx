@@ -69,7 +69,7 @@ export default function Header() {
             </button>
           </div>
         </div>
-        <div id="mobile-menu" className="mobile-menu" hidden={!open} data-lenis-prevent>
+        <div id="mobile-menu" className="mobile-menu" hidden={!open}>
           <nav aria-label="Mobile">
             <NavLink to="/" end>
               Home

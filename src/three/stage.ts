@@ -33,7 +33,7 @@ export function createStage({ canvas, shadows = true, pixelRatio = 1, preserveDr
   const key = new THREE.DirectionalLight("#ffe3bd", 2.6);
   key.position.set(-4, 7, 5);
   key.castShadow = shadows;
-  key.shadow.mapSize.set(2048, 2048);
+  key.shadow.mapSize.set(1024, 1024);
   key.shadow.camera.left = key.shadow.camera.bottom = -4;
   key.shadow.camera.right = key.shadow.camera.top = 4;
   key.shadow.camera.near = 1;

@@ -52,7 +52,6 @@ export default function OrderDialog() {
     <dialog
       ref={ref}
       className="order-dialog"
-      data-lenis-prevent
       aria-labelledby="order-title"
       onClose={closeOrder}
       onClick={(e) => {

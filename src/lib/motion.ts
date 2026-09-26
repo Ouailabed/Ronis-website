@@ -1,39 +1,35 @@
 import { gsap } from "gsap";
 import { ScrollTrigger } from "gsap/ScrollTrigger";
-import Lenis from "lenis";
 
 gsap.registerPlugin(ScrollTrigger);
-
-let lenis: Lenis | null = null;
+// mobile browsers resize the viewport when the address bar hides; don't re-measure for that
+ScrollTrigger.config({ ignoreMobileResize: true });
 
 export const reducedMotion = () => typeof window !== "undefined" && window.matchMedia("(prefers-reduced-motion: reduce)").matches;
 
-/** Smooth, weighted scrolling (desktop and touch) kept in sync with ScrollTrigger. Off for reduced motion. */
+/**
+ * Native scrolling everywhere (no scroll-jacking): it's the smoothest and most reliable on
+ * every device. Returns a cleanup for API compatibility.
+ */
 export function startSmoothScroll() {
-  if (lenis || reducedMotion()) return () => undefined;
-  lenis = new Lenis({ lerp: 0.11, wheelMultiplier: 1, touchMultiplier: 1.2 });
-  lenis.on("scroll", ScrollTrigger.update);
-  const tick = (time: number) => lenis?.raf(time * 1000);
-  gsap.ticker.add(tick);
-  gsap.ticker.lagSmoothing(0);
-  return () => {
-    gsap.ticker.remove(tick);
-    lenis?.destroy();
-    lenis = null;
-  };
+  // re-measure scroll-driven animations once fonts and images have settled the layout
+  const refresh = () => ScrollTrigger.refresh();
+  document.fonts?.ready.then(refresh);
+  window.addEventListener("load", refresh);
+  return () => window.removeEventListener("load", refresh);
 }
 
-/** Jump to a position (or element), with or without smoothing. */
+/** Jump to a position (or element). */
 export function scrollToTarget(target: number | HTMLElement, immediate = false) {
-  if (lenis) lenis.scrollTo(target, { immediate, offset: typeof target === "number" ? 0 : -80 });
-  else if (typeof target === "number") window.scrollTo(0, target);
-  else target.scrollIntoView({ behavior: immediate || reducedMotion() ? "auto" : "smooth" });
+  // "instant" (not "auto") so a page change always lands at the top without a visible scroll
+  const behavior: ScrollBehavior = immediate || reducedMotion() ? "instant" : "smooth";
+  if (typeof target === "number") window.scrollTo({ top: target, behavior });
+  else target.scrollIntoView({ behavior });
 }
 
+/** Stop the page scrolling behind a dialog or menu. */
 export function lockScroll(locked: boolean) {
-  if (!lenis) return;
-  if (locked) lenis.stop();
-  else lenis.start();
+  document.documentElement.style.overflow = locked ? "hidden" : "";
 }
 
 export { gsap, ScrollTrigger };

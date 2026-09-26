@@ -65,16 +65,14 @@ a:hover .logo-mark {
   position: sticky;
   top: 0;
   z-index: 100;
-  transition: background 0.3s ease, box-shadow 0.3s ease, backdrop-filter 0.3s ease;
+  transition: background-color 0.25s ease, color 0.25s ease, box-shadow 0.25s ease;
 }
 .site-header {
   color: var(--ink);
 }
 .site-header.is-scrolled,
 .site-header.is-open {
-  background: rgba(243, 234, 217, 0.88);
-  backdrop-filter: saturate(1.4) blur(14px);
-  -webkit-backdrop-filter: saturate(1.4) blur(14px);
+  background: var(--cream);
   box-shadow: 0 1px 0 var(--line);
 }
 .header-inner {
@@ -213,9 +211,7 @@ a:hover .logo-mark {
     gap: 8px;
     padding: 8px;
     border-radius: 999px;
-    background: rgba(251, 247, 238, 0.92);
-    backdrop-filter: blur(14px);
-    -webkit-backdrop-filter: blur(14px);
+    background: var(--paper);
     box-shadow: 0 12px 30px -12px rgba(20, 42, 70, 0.45), 0 0 0 1px var(--line);
   }
   .mobile-bar .btn {

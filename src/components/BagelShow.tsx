@@ -31,7 +31,8 @@ export default function BagelShowSection() {
   const sectionRef = useRef<HTMLElement>(null);
   const canvasRef = useRef<HTMLCanvasElement>(null);
   const [ready, setReady] = useState(false);
-  const [progress, setProgress] = useState(0);
+  // only the parts of the UI that change at thresholds live in React state (not every frame)
+  const [stage, setStage] = useState({ active: -1, pastHero: false, finale: false });
 
   // the static version (reduced motion / no WebGL) has the blue hero too
   useEffect(() => {
@@ -53,6 +54,8 @@ export default function BagelShowSection() {
     let frame = 0, visible = true, disposed = false;
     let target = 0, smooth = 0, last = performance.now();
     const pointer = { x: 0, y: 0 };
+    const lastPointer = { x: 0, y: 0 };
+    let lastPointerT = 0, needsDraw = true;
     const touch = window.matchMedia("(hover: none)").matches;
     const t0 = performance.now();
 
@@ -84,13 +87,30 @@ export default function BagelShowSection() {
       // time-based easing, so slower devices still keep up with the scroll
       const nowT = performance.now(), dt = Math.min(0.1, (nowT - last) / 1000);
       last = nowT;
-      smooth += (target - smooth) * (1 - Math.exp(-dt * 9));
+      smooth += (target - smooth) * (1 - Math.exp(-dt * 16));
       if (Math.abs(target - smooth) < 0.0005) smooth = target;
-      const l = layout();
-      show.update({ progress: smooth, pointer, time: (performance.now() - t0) / 1000, touch, ...l });
-      show.render();
+      // redraw only while something is moving: scrolling, the pointer, or the idle sway in the hero
+      const pointerMoved = Math.abs(pointer.x - lastPointer.x) + Math.abs(pointer.y - lastPointer.y) > 0.001;
+      const settled = smooth === target && !pointerMoved && nowT - lastPointerT > 1200;
+      const idleSway = smooth < 0.2; // the hero bagel gently turns on its own
+      if (!settled || idleSway || needsDraw) {
+        const l = layout();
+        show.update({ progress: smooth, pointer, time: (nowT - t0) / 1000, touch, ...l });
+        show.render();
+        needsDraw = false;
+      }
+      if (pointerMoved) {
+        lastPointer.x = pointer.x;
+        lastPointer.y = pointer.y;
+        lastPointerT = nowT;
+      }
       section.style.setProperty("--p", smooth.toFixed(4));
-      setProgress((prev) => (Math.abs(prev - smooth) > 0.004 ? smooth : prev));
+      const next = {
+        active: STEPS.findIndex((st) => smooth >= st.at[0] && smooth < st.at[1]),
+        pastHero: smooth > 0.16,
+        finale: smooth >= 0.8,
+      };
+      setStage((prev) => (prev.active === next.active && prev.pastHero === next.pastHero && prev.finale === next.finale ? prev : next));
       frame = requestAnimationFrame(tick);
     };
     const wake = () => {
@@ -110,6 +130,7 @@ export default function BagelShowSection() {
     const resize = () => {
       if (!show) return;
       show.resize(canvas.clientWidth, canvas.clientHeight);
+      needsDraw = true;
       measure();
       wake();
     };
@@ -162,13 +183,12 @@ export default function BagelShowSection() {
     };
   }, [cinematic]);
 
-  const active = STEPS.findIndex((s) => progress >= s.at[0] && progress < s.at[1]);
-  const finale = progress >= 0.8;
+  const { active, finale, pastHero } = stage;
 
   return (
     <section
       ref={sectionRef}
-      className={`show${cinematic ? " is-cinematic" : " is-static"}${ready ? " is-ready" : ""}${progress > 0.16 ? " is-past-hero" : ""}`}
+      className={`show${cinematic ? " is-cinematic" : " is-static"}${ready ? " is-ready" : ""}${pastHero ? " is-past-hero" : ""}`}
       aria-label="Roni's bagels"
     >
       <div className="show-stage">

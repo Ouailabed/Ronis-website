@@ -69,8 +69,9 @@ export class BagelShow {
     const high = quality === "high";
     this.stage = createStage({
       canvas,
-      shadows: high,
-      pixelRatio: opts.pixelRatio ?? Math.min(window.devicePixelRatio || 1, high ? 2 : 1.5),
+      // the soft contact shadow under the bagel is baked; real-time shadow maps cost too much per frame
+      shadows: !!opts.preserveDrawingBuffer,
+      pixelRatio: opts.pixelRatio ?? Math.min(window.devicePixelRatio || 1, high ? 1.75 : 1.25),
       preserveDrawingBuffer: opts.preserveDrawingBuffer,
     });
     const { scene } = this.stage;

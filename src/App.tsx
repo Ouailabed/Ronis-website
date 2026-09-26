@@ -4,7 +4,7 @@ import "./styles/base.css";
 import "./styles/layout.css";
 import "./styles/home.css";
 import "./styles/pages.css";
-import { lazy, Suspense, useEffect } from "react";
+import { lazy, Suspense, useEffect, useLayoutEffect } from "react";
 import { Route, Routes, useLocation } from "react-router-dom";
 import Cursor from "./components/Cursor";
 import Footer from "./components/Footer";
@@ -27,7 +27,8 @@ const NotFound = lazy(() => import("./pages/NotFound"));
 /** Scroll to top on navigation (or to the #hash target), like a normal website. */
 function ScrollManager() {
   const { pathname, hash } = useLocation();
-  useEffect(() => {
+  // layout effect: reset the scroll before the new page is painted (no flash at the old position)
+  useLayoutEffect(() => {
     const el = hash ? document.getElementById(decodeURIComponent(hash.slice(1))) : null;
     if (el) scrollToTarget(el, true);
     else scrollToTarget(0, true);
