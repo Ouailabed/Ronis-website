@@ -49,7 +49,7 @@ try {
     page.on("console", (m) => m.type() === "error" && errors.push(m.text()));
     await page.goto(BASE + route, { waitUntil: "networkidle" });
     const h1 = await page.locator("h1").first().innerText();
-    ok(h1.length > 0 && !/hole in it/.test(h1), `${route} renders (h1: “${h1.replace(/\s+/g, " ")}”)`);
+    ok(h1.length > 0 && !/hole in it/i.test(h1), `${route} renders (h1: “${h1.replace(/\s+/g, " ")}”)`);
     const title = await page.title();
     ok(/Roni's/.test(title), `${route} has a page title (${title})`);
     const desc = await page.locator('meta[name="description"]').getAttribute("content");
@@ -81,11 +81,11 @@ try {
   for (const link of internal) {
     await page.goto(BASE + link, { waitUntil: "networkidle" });
     const h1 = await page.locator("h1").first().innerText();
-    ok(!/hole in it/.test(h1), `internal link ${link} resolves`);
+    ok(!/hole in it/i.test(h1), `internal link ${link} resolves`);
   }
   for (const link of external) ok(ALLOWED_EXTERNAL.some((re) => re.test(link)), `external link is a verified destination: ${link}`);
   await page.goto(BASE + "/not-a-page", { waitUntil: "networkidle" });
-  ok(/hole in it/.test(await page.locator("h1").innerText()), "unknown routes show the 404 page");
+  ok(/hole in it/i.test(await page.locator("h1").innerText()), "unknown routes show the 404 page");
 
   /* ------------------------------------------------ order flow with the keyboard */
   await page.goto(BASE + "/menu", { waitUntil: "networkidle" });

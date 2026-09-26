@@ -776,12 +776,12 @@
 }
 .about-quote p {
   font-family: var(--display);
-  font-size: clamp(28px, 3.2vw, 46px);
-  font-style: italic;
-  font-weight: 450;
+  font-size: clamp(30px, 3.4vw, 50px);
+  font-style: normal;
+  font-weight: 700;
   line-height: 1.18;
   color: var(--blue-deep);
-  font-variation-settings: "SOFT" 100, "WONK" 1;
+  font-variation-settings: "wdth" 80;
 }
 .about-quote cite {
   font-style: normal;

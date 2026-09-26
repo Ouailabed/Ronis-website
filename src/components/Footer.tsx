@@ -75,6 +75,9 @@ export default function Footer() {
           </ul>
         </div>
       </div>
+      <p className="footer-giant" aria-hidden="true">
+        Roni's
+      </p>
       <div className="container footer-small">
         <p>
           © {new Date().getFullYear()} {brand.legalName}. Shop details checked against ronisonline.co.uk, {LAST_CHECKED}.

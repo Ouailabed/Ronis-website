@@ -1,15 +1,17 @@
-import "@fontsource-variable/fraunces/full.css";
-import "@fontsource-variable/fraunces/full-italic.css";
-import "@fontsource-variable/instrument-sans/index.css";
+import "@fontsource-variable/bricolage-grotesque/standard.css";
+import "@fontsource/dm-mono/400.css";
+import "@fontsource/dm-mono/500.css";
 import "./styles/base.css";
 import "./styles/layout.css";
 import "./styles/home.css";
 import "./styles/pages.css";
 import { lazy, Suspense, useEffect } from "react";
 import { Route, Routes, useLocation } from "react-router-dom";
+import Cursor from "./components/Cursor";
 import Footer from "./components/Footer";
 import Header from "./components/Header";
 import OrderDialog from "./components/OrderDialog";
+import { ScrollTrigger, scrollToTarget, startSmoothScroll } from "./lib/motion";
 import { OrderProvider } from "./lib/order";
 import { useReveal } from "./lib/useReveal";
 import Home from "./pages/Home";
@@ -27,14 +29,12 @@ const NotFound = lazy(() => import("./pages/NotFound"));
 function ScrollManager() {
   const { pathname, hash } = useLocation();
   useEffect(() => {
-    if (hash) {
-      const el = document.getElementById(decodeURIComponent(hash.slice(1)));
-      if (el) {
-        el.scrollIntoView();
-        return;
-      }
-    }
-    window.scrollTo(0, 0);
+    const el = hash ? document.getElementById(decodeURIComponent(hash.slice(1))) : null;
+    if (el) scrollToTarget(el, true);
+    else scrollToTarget(0, true);
+    // new page content: let scroll-driven animations re-measure
+    const id = window.setTimeout(() => ScrollTrigger.refresh(), 300);
+    return () => window.clearTimeout(id);
   }, [pathname, hash]);
   return null;
 }
@@ -42,6 +42,11 @@ function ScrollManager() {
 function Shell() {
   const { pathname } = useLocation();
   useReveal();
+  useEffect(() => startSmoothScroll(), []);
+  useEffect(() => {
+    // pages other than home have no intro, so their entrance animations can play straight away
+    if (pathname !== "/") document.documentElement.classList.add("intro-done");
+  }, [pathname]);
   return (
     <>
       <ScrollManager />
@@ -63,6 +68,7 @@ function Shell() {
       </main>
       <Footer />
       <OrderDialog />
+      <Cursor />
     </>
   );
 }

@@ -2,6 +2,7 @@ import { useEffect, useRef } from "react";
 import { Link } from "react-router-dom";
 import { catering, locations, ordering } from "../data/business";
 import { fullAddress, openStatus, telHref } from "../lib/hours";
+import { lockScroll } from "../lib/motion";
 import { useOrder } from "../lib/order";
 import { useLondonNow } from "../lib/useLondonNow";
 import { ArrowRight, ArrowUpRight, Bag, Bike, Calendar, Close, Phone } from "./Icons";
@@ -33,7 +34,9 @@ export default function OrderDialog() {
         }
       }
       dialog.showModal();
+      lockScroll(true);
     } else if (!state.open && dialog.open) dialog.close();
+    if (!state.open) lockScroll(false);
   }, [state.open]); // eslint-disable-line react-hooks/exhaustive-deps
 
   useEffect(() => {
@@ -49,6 +52,7 @@ export default function OrderDialog() {
     <dialog
       ref={ref}
       className="order-dialog"
+      data-lenis-prevent
       aria-labelledby="order-title"
       onClose={closeOrder}
       onClick={(e) => {

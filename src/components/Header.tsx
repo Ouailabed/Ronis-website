@@ -1,5 +1,6 @@
 import { useEffect, useState } from "react";
 import { Link, NavLink, useLocation } from "react-router-dom";
+import { lockScroll } from "../lib/motion";
 import { useOrder } from "../lib/order";
 import { Bag, Close, Menu, Pin } from "./Icons";
 import Logo from "./Logo";
@@ -28,6 +29,7 @@ export default function Header() {
   }, []);
   useEffect(() => {
     document.body.style.overflow = open ? "hidden" : "";
+    lockScroll(open);
     const onKey = (e: KeyboardEvent) => e.key === "Escape" && setOpen(false);
     window.addEventListener("keydown", onKey);
     return () => window.removeEventListener("keydown", onKey);
@@ -67,7 +69,7 @@ export default function Header() {
             </button>
           </div>
         </div>
-        <div id="mobile-menu" className="mobile-menu" hidden={!open}>
+        <div id="mobile-menu" className="mobile-menu" hidden={!open} data-lenis-prevent>
           <nav aria-label="Mobile">
             <NavLink to="/" end>
               Home

@@ -2,6 +2,7 @@ import { useEffect, useRef, useState } from "react";
 import { Link } from "react-router-dom";
 import { useOrder } from "../lib/order";
 import { usePrefersReducedMotion } from "../lib/useReveal";
+import { scrollToTarget } from "../lib/motion";
 import { hasWebGL } from "../lib/webgl";
 import renders from "../data/renders";
 import { Bag, Pin } from "./Icons";
@@ -32,6 +33,18 @@ export default function BagelShowSection() {
   const [ready, setReady] = useState(false);
   const [progress, setProgress] = useState(0);
 
+  // the static version (reduced motion / no WebGL) has the blue hero too
+  useEffect(() => {
+    if (cinematic) return;
+    const set = () => document.documentElement.classList.toggle("on-dark-hero", window.scrollY < window.innerHeight * 0.6);
+    set();
+    window.addEventListener("scroll", set, { passive: true });
+    return () => {
+      window.removeEventListener("scroll", set);
+      document.documentElement.classList.remove("on-dark-hero");
+    };
+  }, [cinematic]);
+
   useEffect(() => {
     if (!cinematic) return;
     const section = sectionRef.current, canvas = canvasRef.current;
@@ -47,16 +60,21 @@ export default function BagelShowSection() {
       const rect = section.getBoundingClientRect();
       const total = rect.height - window.innerHeight;
       target = clamp01(-rect.top / Math.max(1, total));
-      if (!show) section.style.setProperty("--p", target.toFixed(4)); // keeps the still image in sync before 3D loads
+      // light header only while the blue hero is actually on screen
+      document.documentElement.classList.toggle("on-dark-hero", target < 0.12 && rect.bottom > 0);
+      if (!show) {
+        section.style.setProperty("--p", target.toFixed(4)); // keeps the still image in sync before 3D loads
+      }
     };
     const layout = () => {
       const w = canvas.clientWidth, h = canvas.clientHeight;
       // side-by-side only on wide, landscape screens; portrait tablets stack like phones
       const wide = w >= 900 && w / h > 1.1;
       return {
-        heroOffset: wide ? { x: w * 0.23, y: h * 0.03 } : { x: 0, y: h * 0.2 },
+        // hero: bagel centred, in front of the giant wordmark
+        heroOffset: wide ? { x: 0, y: -h * 0.07 } : { x: 0, y: -h * 0.02 },
         finaleOffset: wide ? { x: w * 0.2, y: h * 0.04 } : { x: 0, y: h * 0.14 },
-        heroScale: wide ? 1.05 : w < 520 ? 0.72 : 0.82,
+        heroScale: wide ? 0.92 : w < 520 ? 0.72 : 0.85,
         showScale: wide ? 1 : w < 520 ? 0.56 : 0.78,
       };
     };
@@ -139,6 +157,7 @@ export default function BagelShowSection() {
       ro.disconnect();
       window.removeEventListener("scroll", onScroll);
       window.removeEventListener("pointermove", onPointer);
+      document.documentElement.classList.remove("on-dark-hero");
       show?.dispose();
     };
   }, [cinematic]);
@@ -153,6 +172,20 @@ export default function BagelShowSection() {
       aria-label="Roni's bagels"
     >
       <div className="show-stage">
+        {/* background colour shifts with the story: blue hero → cream → salmon finale */}
+        <div className="show-bg" aria-hidden="true">
+          <i className="bg-cream" />
+          <i className="bg-salmon" />
+        </div>
+
+        <div className="show-word" aria-hidden="true">
+          {"RONI'S".split("").map((c, i) => (
+            <span key={i} style={{ "--i": i } as React.CSSProperties}>
+              {c}
+            </span>
+          ))}
+        </div>
+
         <div className="show-visual" aria-hidden="true">
           <img
             className="show-still"
@@ -169,21 +202,20 @@ export default function BagelShowSection() {
 
         <div className="show-hero container">
           <div className="show-hero-copy">
-            <p className="eyebrow">West Hampstead · since 1989</p>
             <h1>
               A London classic. <em>Fresh every day.</em>
             </h1>
-            <p className="lede">Bagels and Jewish baked goods from Roni's — six North London bakeries, platters for a crowd and cakes for any occasion.</p>
-            <div className="show-actions">
-              <button className="btn" onClick={() => openOrder()}>
-                <Bag />
-                Order now
-              </button>
-              <Link className="btn btn-ghost" to="/locations">
-                <Pin />
-                Find your Roni's
-              </Link>
-            </div>
+            <p className="show-hero-lede">Bagels and Jewish baked goods from West Hampstead, since 1989. Six bakeries across North London.</p>
+          </div>
+          <div className="show-actions">
+            <button className="btn btn-light" onClick={() => openOrder()}>
+              <Bag />
+              Order now
+            </button>
+            <Link className="btn btn-ghost" to="/locations">
+              <Pin />
+              Find your Roni's
+            </Link>
           </div>
         </div>
 
@@ -191,10 +223,10 @@ export default function BagelShowSection() {
           <>
             <ol className="show-steps" aria-hidden={!ready}>
               {STEPS.map((s, i) => (
-                <li key={s.n} className={i === active ? "is-active" : undefined}>
-                  <span className="show-step-n">{s.n}</span>
+                <li key={s.n} className={i === active ? "is-active" : i < active ? "is-done" : undefined}>
+                  <span className="show-step-n">{s.n} / 03</span>
                   <strong>{s.title}</strong>
-                  <span>{s.text}</span>
+                  <span className="show-step-text">{s.text}</span>
                 </li>
               ))}
             </ol>
@@ -203,7 +235,7 @@ export default function BagelShowSection() {
               <h2>
                 Smoked salmon <em>&amp; cream cheese</em>
               </h2>
-              <button className="btn btn-gold" onClick={() => openOrder()} tabIndex={finale ? 0 : -1}>
+              <button className="btn" onClick={() => openOrder()} tabIndex={finale ? 0 : -1}>
                 Order yours
               </button>
             </div>
@@ -212,10 +244,11 @@ export default function BagelShowSection() {
               href="#showcase"
               onClick={(e) => {
                 e.preventDefault();
-                document.getElementById("showcase")?.scrollIntoView({ behavior: reduced ? "auto" : "smooth" });
+                const el = document.getElementById("showcase");
+                if (el) scrollToTarget(el, reduced);
               }}
             >
-              Skip the bagel
+              Skip ↓
             </a>
             <span className="show-note">Digital illustration</span>
           </>
