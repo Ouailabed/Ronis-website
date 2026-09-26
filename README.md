@@ -33,6 +33,16 @@ Tips:
 - Opening hours use 24-hour times, e.g. `{ days: "Mon-Fri", open: "07:00", close: "18:00" }`. Add one line per set of days. These drive the "Open now" badges, so keep them accurate.
 - Lines marked `// TODO` still need checking — some addresses, phone numbers and opening hours were not publicly available.
 
+### Adding photos
+
+1. Put the photos in `public/images/` (JPG or WebP, around 1600px wide at most).
+2. List them in `src/content.js`:
+   - `gallery`: the "From the counter" row of taped polaroids. The section stays hidden until you add one.
+   - `stores[].photo`: a shopfront polaroid that follows the mouse when someone hovers over that shop (shown as a small thumbnail on phones).
+   - `story.photo`: a polaroid next to "Our story". An old photo of the first shop would be perfect.
+
+If a photo file is missing, it hides itself instead of showing a broken image. Only use Roni's own photos or ones you have permission to use.
+
 ### Changing colours
 
 The brand colours are at the top of [`src/styles.css`](src/styles.css) (`--paper`, `--ink`, `--red`, `--mustard`). Change them there and the whole site follows.
@@ -70,7 +80,7 @@ src/App.jsx                 ← the page sections
 src/components/BagelPit.jsx ← the bagels you can throw (physics)
 src/lib/bagel.js            ← how each bagel is drawn
 src/lib/time.js             ← London time, "Open now" logic
-public/                     ← favicon
+public/images/              ← photos go here
 ```
 
 ## Credits & licences

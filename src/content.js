@@ -86,6 +86,16 @@ export const menu = [
 ];
 
 /*
+ * PHOTOS  ("From the counter" — a row of taped-up polaroids)
+ *  Put photo files in the /public/images folder, then list them here.
+ *  The section stays hidden until at least one photo is added.
+ *  Use Roni's own photos (or ones you have permission to use).
+ *  Example:
+ *    { src: "/images/salt-beef-bagel.jpg", caption: "hot salt beef, the real deal" },
+ */
+export const gallery = [];
+
+/*
  * OCCASIONS  (cakes, platters, catering) — shown as a till receipt
  */
 export const occasions = {
@@ -105,6 +115,7 @@ export const occasions = {
  *    close "24:00" means midnight.
  *  The site uses these to show "Open now" / "Closed" live.
  *  Leave hours: [] if unknown — the status is just hidden.
+ *  photo: shows as a polaroid when someone hovers over the shop.
  */
 export const stores = [
   {
@@ -114,6 +125,7 @@ export const stores = [
     phone: "020 7794 6663",
     hours: [{ days: "Mon-Sun", open: "07:00", close: "24:00" }], // TODO: confirm current hours
     deliveroo: "https://deliveroo.co.uk/menu/london/west-hampstead/ronis-bakery",
+    photo: "", // shopfront photo, e.g. "/images/shop-west-hampstead.jpg"
   },
   {
     name: "Belsize Village",
@@ -122,6 +134,7 @@ export const stores = [
     phone: "020 7998 1477",
     hours: [], // TODO
     deliveroo: "https://deliveroo.co.uk/menu/london/belsize-park/ronis-belsize",
+    photo: "", // shopfront photo, e.g. "/images/shop-west-hampstead.jpg"
   },
   {
     name: "Swains Lane",
@@ -130,6 +143,7 @@ export const stores = [
     phone: "", // TODO
     hours: [], // TODO
     deliveroo: "",
+    photo: "", // shopfront photo, e.g. "/images/shop-west-hampstead.jpg"
   },
   {
     name: "Hampstead",
@@ -138,6 +152,7 @@ export const stores = [
     phone: "", // TODO
     hours: [], // TODO
     deliveroo: "",
+    photo: "", // shopfront photo, e.g. "/images/shop-west-hampstead.jpg"
   },
   {
     name: "Muswell Hill",
@@ -146,6 +161,7 @@ export const stores = [
     phone: "", // TODO
     hours: [], // TODO
     deliveroo: "",
+    photo: "", // shopfront photo, e.g. "/images/shop-west-hampstead.jpg"
   },
   {
     name: "Brent Cross",
@@ -154,10 +170,13 @@ export const stores = [
     phone: "", // TODO
     hours: [], // TODO
     deliveroo: "",
+    photo: "", // shopfront photo, e.g. "/images/shop-west-hampstead.jpg"
   },
 ];
 
 export const story = {
+  photo: "", // e.g. an old photo of the first shop: "/images/west-end-lane-1989.jpg"
+  photoCaption: "West End Lane, where it all started",
   // The big sentence. The part inside [square brackets] gets a hand-drawn circle.
   headline: "Since [1989], we've been boiling and baking bagels on West End Lane.",
   paragraphs: [

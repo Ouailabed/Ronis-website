@@ -1,8 +1,9 @@
 import { useEffect, useRef, useState } from "react";
 import BagelPit from "./components/BagelPit";
 import Bagel from "./components/Bagel";
+import Polaroid from "./components/Polaroid";
 import { Arrow, Circle, Underline } from "./components/Scribble";
-import { business, fridayMessage, liveMessages, menu, occasions, stores, story } from "./content";
+import { business, fridayMessage, gallery, liveMessages, menu, occasions, stores, story } from "./content";
 import { formatTime, liveMessage, londonNow, storeStatus } from "./lib/time";
 
 const NAV = [
@@ -172,6 +173,22 @@ function Menu() {
   );
 }
 
+function Gallery() {
+  if (!gallery.length) return null;
+  return (
+    <section className="gallery" aria-label="Photos from Roni's">
+      <div className="gallery-head reveal">
+        <p className="mono label">From the counter</p>
+      </div>
+      <div className="gallery-row">
+        {gallery.map((photo) => (
+          <Polaroid key={photo.src} src={photo.src} caption={photo.caption} />
+        ))}
+      </div>
+    </section>
+  );
+}
+
 function Occasions() {
   return (
     <section className="occasions" id="occasions">
@@ -209,8 +226,23 @@ function Occasions() {
 }
 
 function Stores({ now }) {
+  const [hovered, setHovered] = useState(null);
+  const floatRef = useRef(null);
+  // the shopfront polaroid follows the mouse while hovering a shop
+  const follow = (e) => {
+    if (floatRef.current) floatRef.current.style.transform = `translate(${e.clientX + 24}px, ${e.clientY - 120}px)`;
+  };
   return (
-    <section className="section" id="stores">
+    <section className="section" id="stores" onPointerMove={follow}>
+      <div className="store-float" ref={floatRef} aria-hidden="true">
+        {stores.map((s) =>
+          s.photo ? (
+            <div key={s.name} className={`store-float-item${hovered === s.name ? " is-visible" : ""}`}>
+              <Polaroid src={s.photo} caption={s.name} loading="lazy" />
+            </div>
+          ) : null,
+        )}
+      </div>
       <div className="section-head reveal">
         <p className="mono label">Come and say hello</p>
         <h2>
@@ -221,9 +253,15 @@ function Stores({ now }) {
         {stores.map((store, i) => {
           const status = storeStatus(store.hours, now);
           return (
-            <li className="store reveal" key={store.name}>
+            <li
+              className="store reveal"
+              key={store.name}
+              onPointerEnter={(e) => e.pointerType === "mouse" && setHovered(store.name)}
+              onPointerLeave={() => setHovered(null)}
+            >
               <span className="mono store-num">{String(i + 1).padStart(2, "0")}</span>
               <div className="store-name">
+                {store.photo && <img className="store-thumb" src={store.photo} alt="" loading="lazy" />}
                 <h3>{store.name}</h3>
                 {store.note && <span className="hand">{store.note}</span>}
               </div>
@@ -283,7 +321,8 @@ function Story() {
           ),
         )}
       </h2>
-      <div className="story-body reveal">
+      <div className={`story-body reveal${story.photo ? " has-photo" : ""}`}>
+        <Polaroid src={story.photo} caption={story.photoCaption} className="story-photo" />
         {story.paragraphs.map((p) => (
           <p key={p.slice(0, 24)}>{p}</p>
         ))}
@@ -337,6 +376,7 @@ export default function App() {
       <main>
         <Hero />
         <Menu />
+        <Gallery />
         <Occasions />
         <Stores now={now} />
         <Story />
