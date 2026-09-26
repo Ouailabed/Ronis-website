@@ -6,7 +6,7 @@ import { ArrowRight, ArrowUpRight, Bag, Pin } from "../components/Icons";
 import LocationFinder from "../components/LocationFinder";
 import RenderImage from "../components/RenderImage";
 import { catering, locations, ordering, story } from "../data/business";
-import renders from "../data/renders.json";
+import renders from "../data/renders";
 import { useOrder } from "../lib/order";
 import { useSeo } from "../lib/seo";
 

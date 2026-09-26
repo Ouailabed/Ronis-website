@@ -3,7 +3,7 @@ import { Link, useSearchParams } from "react-router-dom";
 import { ArrowUpRight, Bag, Search } from "../components/Icons";
 import RenderImage from "../components/RenderImage";
 import { menu, menuCategories, ordering, type MenuCategory } from "../data/business";
-import renders from "../data/renders.json";
+import renders from "../data/renders";
 import { useOrder } from "../lib/order";
 import { useSeo } from "../lib/seo";
 

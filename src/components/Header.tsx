@@ -35,7 +35,14 @@ export default function Header() {
 
   return (
     <>
-      <a href="#main" className="skip-link">
+      <a
+        href="#main"
+        className="skip-link"
+        onClick={(e) => {
+          e.preventDefault();
+          document.getElementById("main")?.focus();
+        }}
+      >
         Skip to content
       </a>
       <header className={`site-header${scrolled ? " is-scrolled" : ""}${open ? " is-open" : ""}`}>

@@ -83,5 +83,6 @@ function seoPlugin(siteUrl: string): Plugin {
 export default defineConfig(({ mode }) => {
   const env = loadEnv(mode, process.cwd(), "VITE_");
   const siteUrl = (env.VITE_SITE_URL ?? "").replace(/\/$/, "");
-  return { plugins: [react(), seoPlugin(siteUrl)] };
+  // VITE_ARTIFACT=1 builds a relative-path copy for sharing as a single preview link
+  return { base: env.VITE_ARTIFACT ? "./" : "/", plugins: [react(), seoPlugin(siteUrl)] };
 });

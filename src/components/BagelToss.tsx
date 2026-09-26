@@ -1,5 +1,5 @@
 import { useEffect, useRef } from "react";
-import renders from "../data/renders.json";
+import renders from "../data/renders";
 
 /**
  * The finale: rendered bagels tumble onto the table and pile up. Mouse: grab and throw.

@@ -3,7 +3,7 @@ import { ArrowRight } from "../components/Icons";
 import RenderImage from "../components/RenderImage";
 import Shopfront from "../components/Shopfront";
 import { brand, locations, story } from "../data/business";
-import renders from "../data/renders.json";
+import renders from "../data/renders";
 import { useSeo } from "../lib/seo";
 
 export default function About() {

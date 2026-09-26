@@ -1,6 +1,6 @@
 import { StrictMode } from "react";
 import { createRoot } from "react-dom/client";
-import { BrowserRouter } from "react-router-dom";
+import { BrowserRouter, HashRouter } from "react-router-dom";
 import App from "./App";
 
 const root = createRoot(document.getElementById("root")!);
@@ -12,9 +12,16 @@ if (import.meta.env.DEV && window.location.pathname === "/studio") {
 } else {
   root.render(
     <StrictMode>
-      <BrowserRouter>
-        <App />
-      </BrowserRouter>
+      {import.meta.env.VITE_ARTIFACT ? (
+        // shareable preview build: routes live after the # (e.g. #/menu)
+        <HashRouter>
+          <App />
+        </HashRouter>
+      ) : (
+        <BrowserRouter>
+          <App />
+        </BrowserRouter>
+      )}
     </StrictMode>,
   );
 }

@@ -3,7 +3,7 @@ import { Link } from "react-router-dom";
 import { useOrder } from "../lib/order";
 import { usePrefersReducedMotion } from "../lib/useReveal";
 import { hasWebGL } from "../lib/webgl";
-import renders from "../data/renders.json";
+import renders from "../data/renders";
 import { Bag, Pin } from "./Icons";
 import Steam from "./Steam";
 
@@ -207,7 +207,14 @@ export default function BagelShowSection() {
                 Order yours
               </button>
             </div>
-            <a className="show-skip" href="#showcase">
+            <a
+              className="show-skip"
+              href="#showcase"
+              onClick={(e) => {
+                e.preventDefault();
+                document.getElementById("showcase")?.scrollIntoView({ behavior: reduced ? "auto" : "smooth" });
+              }}
+            >
               Skip the bagel
             </a>
             <span className="show-note">Digital illustration</span>

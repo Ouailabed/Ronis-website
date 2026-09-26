@@ -3,7 +3,7 @@ import { Link } from "react-router-dom";
 import { ArrowUpRight, Calendar, Phone } from "../components/Icons";
 import RenderImage from "../components/RenderImage";
 import { catering, locations, ordering } from "../data/business";
-import renders from "../data/renders.json";
+import renders from "../data/renders";
 import { telHref } from "../lib/hours";
 import { useSeo } from "../lib/seo";
 
