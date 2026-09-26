@@ -72,7 +72,7 @@ export function ShopDetails({ shop, headingLevel = 3 }: { shop: Location; headin
   );
 }
 
-export default function LocationFinder() {
+export default function LocationFinder({ headingLevel = 3 }: { headingLevel?: 2 | 3 }) {
   const now = useLondonNow();
   const [selected, setSelected] = useState(locations[0].slug);
   const shop = locations.find((l) => l.slug === selected)!;
@@ -127,7 +127,7 @@ export default function LocationFinder() {
       </div>
 
       <div className="finder-detail" aria-live="polite">
-        <ShopDetails shop={shop} />
+        <ShopDetails shop={shop} headingLevel={headingLevel} />
       </div>
     </div>
   );

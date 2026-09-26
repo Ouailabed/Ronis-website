@@ -117,7 +117,12 @@
   flex-wrap: wrap;
   gap: 12px;
 }
+/* past the hero: the heading stays in the accessibility tree (it's just faded out),
+   but the buttons are hidden so keyboard users can't tab to invisible controls */
 .show.is-past-hero .show-hero-copy {
+  pointer-events: none;
+}
+.show.is-past-hero .show-actions {
   visibility: hidden;
 }
 
@@ -501,7 +506,7 @@
 }
 .story-year span:last-child {
   padding-left: 0.5em;
-  color: var(--gold);
+  color: var(--gold-deep);
   font-style: italic;
   font-weight: 500;
 }

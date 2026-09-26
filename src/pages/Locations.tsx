@@ -30,7 +30,7 @@ export default function Locations() {
       </section>
 
       <section className="container">
-        <LocationFinder />
+        <LocationFinder headingLevel={2} />
       </section>
 
       <section className="container section loc-cards-section">

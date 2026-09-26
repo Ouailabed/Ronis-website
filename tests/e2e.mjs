@@ -4,7 +4,10 @@
  * Uses Chromium via playwright-core (set CHROMIUM_PATH if it isn't at /opt/pw-browsers/chromium).
  */
 import { spawn } from "node:child_process";
+import { readFileSync } from "node:fs";
 import { chromium } from "playwright-core";
+
+const AXE = readFileSync(new URL("../node_modules/axe-core/axe.min.js", import.meta.url), "utf8");
 
 const PORT = 4190;
 const BASE = `http://localhost:${PORT}`;
@@ -54,7 +57,7 @@ try {
     // scroll through so lazy images load
     const h = await page.evaluate(() => document.body.scrollHeight);
     for (let y = 0; y < h; y += 700) await page.evaluate((y) => window.scrollTo(0, y), y);
-    await page.waitForTimeout(600);
+    await page.waitForTimeout(1400); // let scroll-reveal transitions finish
     const broken = await page.evaluate(() => [...document.images].filter((i) => i.complete && i.naturalWidth === 0).map((i) => i.src));
     ok(broken.length === 0, `${route} has no broken images${broken.length ? `: ${broken.join(", ")}` : ""}`);
     const noAlt = await page.evaluate(() => [...document.images].filter((i) => !i.hasAttribute("alt")).length);
@@ -64,6 +67,12 @@ try {
     const tel = links.filter((l) => l.startsWith("tel:"));
     ok(tel.every((t) => /^tel:\+44\d{10}$/.test(t)), `${route} phone links are well-formed (${tel.length})`);
     ok(errors.length === 0, `${route} has no console errors${errors.length ? `: ${errors.join(" | ")}` : ""}`);
+    // automated accessibility audit (WCAG 2 A/AA + best practices)
+    await page.addScriptTag({ content: AXE });
+    const violations = await page.evaluate(async () =>
+      (await window.axe.run(document, { runOnly: ["wcag2a", "wcag2aa", "best-practice"] })).violations.map((v) => `${v.id} (${v.nodes.length})`),
+    );
+    ok(violations.length === 0, `${route} passes axe accessibility checks${violations.length ? `: ${violations.join(", ")}` : ""}`);
     await page.close();
   }
 

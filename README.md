@@ -15,7 +15,7 @@ npm install
 npm run dev            # local dev server → http://localhost:5173
 npm run build          # type-check + production build → dist/
 npm run preview        # serve the production build → http://localhost:4173
-npm run test:e2e       # end-to-end checks against the build (needs Chromium, see below)
+npm run test:e2e       # end-to-end + axe accessibility checks against the build (needs Chromium)
 npm run render:assets  # re-render the 3D food illustrations into public/renders
 ```
 

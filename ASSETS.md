@@ -12,6 +12,7 @@ No Roni's photography was available to this project, so **every food image is an
 | `challah.webp` | Home showcase "Baked goods"; Menu (bakery) | Roni's plaited challah. |
 | `carrot-cake.webp` | Home showcase "Cakes"; Cakes page; Menu | Roni's carrot cake and a bespoke celebration cake. |
 | `platter.webp` | Home showcase and catering band; Catering page; Menu | A real Roni's mini bagel platter (25 minis). |
+| `public/og.jpg` (1200×630) | Social share preview (generated from `bagel-opened`) | A real photo of the salmon bagel or a shopfront. |
 | `top-plain/sesame/poppy.webp` | Home finale (bagels you can throw) | Top-down cut-out photos of three bagels (transparent background). |
 | `src/components/Shopfront.tsx` (SVG) | About page | A real photo of the West End Lane shop, ideally a 1989-era one. |
 

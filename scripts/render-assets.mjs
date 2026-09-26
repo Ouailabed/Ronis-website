@@ -59,6 +59,16 @@ try {
     }
     await page.close();
   }
+  // social share image (JPEG: the most widely supported preview format)
+  if (!only.length || only.includes("opened")) {
+    const dish = await sharp("public/renders/bagel-opened.webp").resize({ height: 560 }).toBuffer();
+    await sharp({ create: { width: 1200, height: 630, channels: 3, background: "#f6eedf" } })
+      .composite([{ input: dish, gravity: "center" }])
+      .jpeg({ quality: 84, mozjpeg: true })
+      .toFile("public/og.jpg");
+    console.log("✓ public/og.jpg");
+  }
+
   // size manifest used by the site for width/height attributes (no layout shift)
   const manifest = {};
   for (const f of (await readdir("public/renders")).filter((f) => f.endsWith(".webp")).sort()) {
