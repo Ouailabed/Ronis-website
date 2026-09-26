@@ -781,7 +781,6 @@
   font-weight: 700;
   line-height: 1.18;
   color: var(--blue-deep);
-  font-variation-settings: "wdth" 80;
 }
 .about-quote cite {
   font-style: normal;

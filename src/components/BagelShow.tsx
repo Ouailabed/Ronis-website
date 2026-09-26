@@ -178,6 +178,8 @@ export default function BagelShowSection() {
           <i className="bg-salmon" />
         </div>
 
+        <div className="awning show-awning" aria-hidden="true" />
+
         <div className="show-word" aria-hidden="true">
           {"RONI'S".split("").map((c, i) => (
             <span key={i} style={{ "--i": i } as React.CSSProperties}>

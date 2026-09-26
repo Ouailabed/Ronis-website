@@ -1,6 +1,5 @@
-import "@fontsource-variable/bricolage-grotesque/standard.css";
-import "@fontsource/dm-mono/400.css";
-import "@fontsource/dm-mono/500.css";
+import "@fontsource/gloock/400.css";
+import "@fontsource-variable/instrument-sans/index.css";
 import "./styles/base.css";
 import "./styles/layout.css";
 import "./styles/home.css";

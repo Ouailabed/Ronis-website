@@ -43,7 +43,9 @@ try {
   const internal = new Set();
   const external = new Set();
   for (const route of ROUTES) {
-    const page = await browser.newPage({ viewport: { width: 1280, height: 800 } });
+    // reduced motion: no smooth-scroll lag or mid-animation fades, so content checks and the
+    // accessibility audit see the page's settled state
+    const page = await browser.newPage({ viewport: { width: 1280, height: 800 }, reducedMotion: "reduce" });
     const errors = [];
     page.on("pageerror", (e) => errors.push(e.message));
     page.on("console", (m) => m.type() === "error" && errors.push(m.text()));
@@ -57,7 +59,7 @@ try {
     // scroll through so lazy images load
     const h = await page.evaluate(() => document.body.scrollHeight);
     for (let y = 0; y < h; y += 700) await page.evaluate((y) => window.scrollTo(0, y), y);
-    await page.waitForTimeout(1400); // let scroll-reveal transitions finish
+    await page.waitForTimeout(2500); // let smooth scroll and reveal transitions finish
     const broken = await page.evaluate(() => [...document.images].filter((i) => i.complete && i.naturalWidth === 0).map((i) => i.src));
     ok(broken.length === 0, `${route} has no broken images${broken.length ? `: ${broken.join(", ")}` : ""}`);
     const noAlt = await page.evaluate(() => [...document.images].filter((i) => !i.hasAttribute("alt")).length);
@@ -160,7 +162,7 @@ try {
   ok(await m.locator("#mobile-menu").isVisible(), "mobile: menu button opens navigation");
   await m.locator("#mobile-menu a", { hasText: "Locations" }).click();
   await m.waitForURL("**/locations");
-  await m.waitForTimeout(300);
+  await m.waitForTimeout(1000);
   ok(!(await m.locator("#mobile-menu").isVisible()), "mobile: navigating closes the menu");
   const overflow = await m.evaluate(() => document.documentElement.scrollWidth - window.innerWidth);
   ok(overflow <= 0, `mobile: no horizontal overflow (${overflow}px)`);

@@ -39,8 +39,7 @@ a:hover .logo-mark {
 .logo-name {
   font-family: var(--display);
   font-size: 30px;
-  font-weight: 800;
-  font-variation-settings: "wdth" 75;
+  font-weight: 400;
   text-transform: uppercase;
   letter-spacing: -0.01em;
 }
@@ -167,8 +166,7 @@ a:hover .logo-mark {
   border-bottom: 1px solid var(--line);
   font-family: var(--display);
   font-size: 48px;
-  font-weight: 800;
-  font-variation-settings: "wdth" 75;
+  font-weight: 400;
   text-transform: uppercase;
   line-height: 1;
   color: var(--ink);
@@ -308,8 +306,7 @@ a:hover .logo-mark {
 .order-shop-name {
   font-family: var(--display);
   font-size: 26px;
-  font-weight: 800;
-  font-variation-settings: "wdth" 75;
+  font-weight: 400;
   text-transform: uppercase;
   line-height: 1;
   color: var(--ink);
@@ -358,7 +355,7 @@ a:hover .logo-mark {
 .site-footer {
   position: relative;
   overflow: hidden;
-  background: var(--ink);
+  background: var(--bottle-deep);
   color: rgba(251, 247, 238, 0.82);
   padding: clamp(64px, 8vw, 110px) 0 36px;
 }
@@ -491,8 +488,7 @@ a:hover .logo-mark {
   margin: 48px 0 0;
   padding-inline: var(--gutter);
   font-family: var(--display);
-  font-weight: 800;
-  font-variation-settings: "wdth" 75;
+  font-weight: 400;
   font-size: clamp(120px, 30vw, 520px);
   line-height: 0.78;
   letter-spacing: -0.02em;
@@ -500,4 +496,20 @@ a:hover .logo-mark {
   text-align: center;
   color: var(--orange);
   user-select: none;
+}
+
+.footer-awning {
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+}
+.site-footer {
+  padding-top: clamp(90px, 9vw, 130px);
+}
+.logo-name {
+  font-weight: 400;
+  text-transform: none;
+  font-size: 28px;
+  letter-spacing: 0;
 }

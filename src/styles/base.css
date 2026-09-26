@@ -2,42 +2,53 @@
    Roni's — design tokens (bold "deli sign" palette)
    ========================================================================= */
 :root {
-  /* core palette */
-  --blue: #1f3fb5; /* Roni's royal blue: the hero, buttons, big blocks */
-  --blue-deep: #13277a;
-  --orange: #ec7a2f; /* toasted crust */
-  --orange-deep: #a8501a;
-  --salmon: #ff8f6e;
-  --butter: #ffd36e;
-  --cream: #f3ead9;
-  --paper: #fbf6ec;
-  --ink: #121212;
-  --ink-soft: #4a463f;
-  --line: rgba(18, 18, 18, 0.14);
-  --green: #186a3b;
+  /* palette taken from the Roni's shopfront: sage paint, bottle-green awning,
+     blue-and-white stripes, white sign lettering; brass as the premium accent */
+  --sage: #8ba593;
+  --sage-deep: #56725f;
+  --sage-mist: #d7e1d8;
+  --bottle: #1d3a2f;
+  --bottle-deep: #13281f;
+  --stripe: #2b4c93;
+  --brass: #b88f4a;
+  --brass-soft: #e3c992;
+  --cream: #f4eee2;
+  --paper: #fbf8f1;
+  --ink: #17201b;
+  --ink-soft: #4b544e;
+  --line: rgba(23, 32, 27, 0.14);
+  --green: #1e6a3e;
 
-  /* legacy names used across pages, mapped onto the palette */
-  --cream-deep: #e9ddc6;
-  --crust: var(--orange-deep);
-  --gold: var(--orange);
-  --gold-deep: var(--orange-deep);
-  --gold-soft: var(--butter);
-  --kraft: #e8c48f;
-  --kraft-deep: #d5a765;
-  --blue-soft: #d8def5;
+  /* names used across the components, mapped onto the shop palette */
+  --blue: var(--bottle);
+  --blue-deep: var(--bottle-deep);
+  --orange: var(--sage);
+  --orange-deep: var(--sage-deep);
+  --salmon: var(--sage-mist);
+  --butter: var(--brass-soft);
+  --cream-deep: #eae1cf;
+  --crust: var(--sage-deep);
+  --gold: var(--brass);
+  --gold-deep: #8a6a33;
+  --gold-soft: var(--brass-soft);
+  --kraft: #e6d9bf;
+  --kraft-deep: #d4c19c;
+  --blue-soft: var(--sage-mist);
 
-  --display: "Bricolage Grotesque Variable", "Bricolage Grotesque", "Arial Narrow", system-ui, sans-serif;
-  --sans: "Bricolage Grotesque Variable", "Bricolage Grotesque", system-ui, -apple-system, "Segoe UI", sans-serif;
-  --mono: "DM Mono", ui-monospace, "SFMono-Regular", Menlo, monospace;
+  --display: "Gloock", "Playfair Display", Georgia, serif;
+  --sans: "Instrument Sans Variable", "Instrument Sans", system-ui, -apple-system, "Segoe UI", sans-serif;
+  --mono: var(--sans);
 
-  --radius: 20px;
-  --radius-lg: 28px;
+  --radius: 18px;
+  --radius-lg: 26px;
   --gutter: clamp(16px, 4vw, 56px);
   --max: 1400px;
   --header-h: 72px;
   --ease-out: cubic-bezier(0.16, 1, 0.3, 1);
   --ease-spring: cubic-bezier(0.3, 1.4, 0.5, 1);
-  --shadow-soft: 0 1px 1px rgba(18, 18, 18, 0.04), 0 16px 36px -18px rgba(18, 18, 18, 0.35);
+  --shadow-soft: 0 1px 1px rgba(23, 32, 27, 0.04), 0 18px 40px -20px rgba(23, 32, 27, 0.35);
+  /* the awning: blue and white stripes */
+  --awning: repeating-linear-gradient(90deg, var(--stripe) 0 22px, var(--paper) 22px 44px);
 }
 
 *,
@@ -76,7 +87,8 @@ body::before {
   pointer-events: none;
   opacity: 0.25;
   mix-blend-mode: multiply;
-  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='240' height='240'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='.9' numOctaves='3' stitchTiles='stitch'/%3E%3CfeColorMatrix values='0 0 0 0 .4 0 0 0 0 .35 0 0 0 0 .3 0 0 0 .22 0'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)'/%3E%3C/svg%3E");
+  opacity: 0.18;
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='240' height='240'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='.9' numOctaves='3' stitchTiles='stitch'/%3E%3CfeColorMatrix values='0 0 0 0 .35 0 0 0 0 .38 0 0 0 0 .33 0 0 0 .22 0'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)'/%3E%3C/svg%3E");
 }
 img {
   max-width: 100%;
@@ -91,11 +103,11 @@ button {
   color: inherit;
 }
 ::selection {
-  background: var(--orange);
+  background: var(--brass-soft);
   color: var(--ink);
 }
 :focus-visible {
-  outline: 3px solid var(--orange);
+  outline: 3px solid var(--brass);
   outline-offset: 3px;
   border-radius: 6px;
 }
@@ -107,23 +119,21 @@ h3,
 .display {
   margin: 0;
   font-family: var(--display);
-  font-weight: 800;
-  font-variation-settings: "wdth" 75;
-  letter-spacing: -0.01em;
-  line-height: 0.9;
+  font-weight: 400;
+  letter-spacing: -0.005em;
+  line-height: 0.98;
   color: var(--ink);
   text-wrap: balance;
 }
 h1 {
-  font-size: clamp(64px, 11vw, 190px);
-  text-transform: uppercase;
-  letter-spacing: -0.015em;
-  line-height: 0.84;
+  font-size: clamp(54px, 8vw, 132px);
+  letter-spacing: -0.02em;
+  line-height: 0.95;
 }
 h2 {
-  font-size: clamp(48px, 7.4vw, 124px);
-  text-transform: uppercase;
-  line-height: 0.86;
+  font-size: clamp(42px, 5.6vw, 92px);
+  letter-spacing: -0.015em;
+  line-height: 0.98;
 }
 h3 {
   font-size: clamp(26px, 2.4vw, 36px);
@@ -132,7 +142,7 @@ h3 {
 h1 em,
 h2 em {
   font-style: normal;
-  color: var(--blue);
+  color: var(--sage-deep);
 }
 p {
   margin: 0 0 1em;
@@ -142,19 +152,18 @@ p {
   align-items: center;
   gap: 10px;
   margin: 0 0 20px;
-  font-family: var(--mono);
-  font-size: 13px;
-  font-weight: 500;
-  letter-spacing: 0.06em;
+  font-family: var(--sans);
+  font-size: 12.5px;
+  font-weight: 600;
+  letter-spacing: 0.2em;
   text-transform: uppercase;
-  color: var(--ink);
+  color: var(--sage-deep);
 }
 .eyebrow::before {
   content: "";
-  width: 10px;
-  height: 10px;
-  border-radius: 50%;
-  background: var(--orange);
+  width: 26px;
+  height: 1.5px;
+  background: currentColor;
 }
 .lede {
   font-size: clamp(18px, 1.5vw, 22px);
@@ -203,7 +212,7 @@ p {
 
 /* ----------------------------------------------------------------- buttons */
 .btn {
-  --btn-bg: var(--ink);
+  --btn-bg: var(--bottle);
   --btn-fg: var(--paper);
   position: relative;
   display: inline-flex;
@@ -216,9 +225,9 @@ p {
   border-radius: 999px;
   background: var(--btn-bg);
   color: var(--btn-fg);
-  font-weight: 700;
-  font-size: 16px;
-  letter-spacing: 0.01em;
+  font-weight: 600;
+  font-size: 15.5px;
+  letter-spacing: 0.02em;
   text-decoration: none;
   cursor: pointer;
   white-space: nowrap;
@@ -233,7 +242,7 @@ p {
   inset: 0;
   z-index: -1;
   border-radius: inherit;
-  background: var(--btn-hover, var(--orange));
+  background: var(--btn-hover, var(--brass));
   transform: translateY(101%);
   transition: transform 0.45s var(--ease-out);
 }
@@ -241,7 +250,7 @@ p {
   transform: none;
 }
 .btn:hover {
-  color: var(--btn-hover-fg, var(--ink));
+  color: var(--btn-hover-fg, var(--bottle-deep));
   transform: translateY(-2px);
 }
 .btn:active {
@@ -253,8 +262,8 @@ p {
   flex: none;
 }
 .btn-gold {
-  --btn-bg: var(--orange);
-  --btn-fg: var(--ink);
+  --btn-bg: var(--brass);
+  --btn-fg: var(--bottle-deep);
   --btn-hover: var(--paper);
 }
 .btn-ghost {
@@ -292,10 +301,11 @@ p {
   gap: 6px;
   padding: 4px 12px;
   border-radius: 999px;
-  background: var(--butter);
-  font-family: var(--mono);
-  font-size: 12px;
-  font-weight: 500;
+  background: var(--sage-mist);
+  font-family: var(--sans);
+  font-size: 11.5px;
+  font-weight: 600;
+  letter-spacing: 0.12em;
   text-transform: uppercase;
   color: var(--ink);
 }
@@ -305,9 +315,10 @@ p {
   display: inline-flex;
   align-items: center;
   gap: 8px;
-  font-family: var(--mono);
-  font-size: 13px;
-  font-weight: 500;
+  font-family: var(--sans);
+  font-size: 12.5px;
+  font-weight: 600;
+  letter-spacing: 0.1em;
   text-transform: uppercase;
   color: var(--ink-soft);
 }
@@ -326,10 +337,10 @@ p {
   animation: pulse 2.2s infinite;
 }
 .status.is-soon {
-  color: #9a4c12;
+  color: #7c5a1d;
 }
 .status.is-soon i {
-  background: var(--orange);
+  background: var(--brass);
 }
 @keyframes pulse {
   0% {
@@ -350,9 +361,10 @@ p {
   padding: 3px 8px;
   border-radius: 999px;
   background: rgba(251, 246, 236, 0.85);
-  font-family: var(--mono);
-  font-size: 11px;
-  font-weight: 500;
+  font-family: var(--sans);
+  font-size: 10.5px;
+  font-weight: 600;
+  letter-spacing: 0.12em;
   text-transform: uppercase;
   color: var(--ink);
 }
@@ -412,4 +424,14 @@ p {
     opacity: 1;
     transform: none;
   }
+}
+
+/* the awning: a blue-and-white striped band with a scalloped edge, like the shopfront */
+.awning {
+  position: relative;
+  height: 26px;
+  background: var(--awning);
+  --m: linear-gradient(#000 0 0) top / 100% calc(100% - 11px) no-repeat, radial-gradient(11px at 50% 0, #000 98%, #0000) bottom / 22px 11px repeat-x;
+  -webkit-mask: var(--m);
+  mask: var(--m);
 }

@@ -10,6 +10,7 @@ export default function Footer() {
   const { openOrder } = useOrder();
   return (
     <footer className="site-footer">
+      <div className="awning footer-awning" aria-hidden="true" /> 
       <div className="container footer-grid">
         <div className="footer-brand">
           <Logo light />
