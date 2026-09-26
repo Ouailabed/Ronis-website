@@ -1,14 +1,14 @@
-import { lazy, Suspense, useEffect, useState } from "react";
-import { RibbonFieldBackground } from "@designcodeio/threeui/components/RibbonFieldBackground";
-import { business, marquee, story, menu, occasions, stores } from "./content";
-
-// three.js is large, so the 3D bagel loads after the page text is visible
-const Bagel3D = lazy(() => import("./components/Bagel3D"));
+import { useEffect, useRef, useState } from "react";
+import BagelPit from "./components/BagelPit";
+import Bagel from "./components/Bagel";
+import { Arrow, Circle, Underline } from "./components/Scribble";
+import { business, fridayMessage, liveMessages, menu, occasions, stores, story } from "./content";
+import { formatTime, liveMessage, londonNow, storeStatus } from "./lib/time";
 
 const NAV = [
   { href: "#menu", label: "Menu" },
   { href: "#occasions", label: "Occasions" },
-  { href: "#stores", label: "Stores" },
+  { href: "#stores", label: "Shops" },
   { href: "#story", label: "Our story" },
 ];
 
@@ -17,124 +17,155 @@ const mapsUrl = (store) =>
     store.address ? `Roni's ${store.address}` : `Roni's Bakery ${store.name} London`,
   )}`;
 
-function Header() {
-  const [scrolled, setScrolled] = useState(false);
-  const [open, setOpen] = useState(false);
+// London time, re-checked every 30 seconds
+function useLondonNow() {
+  const [now, setNow] = useState(() => londonNow());
   useEffect(() => {
-    const onScroll = () => setScrolled(window.scrollY > 40);
-    onScroll();
-    window.addEventListener("scroll", onScroll, { passive: true });
-    return () => window.removeEventListener("scroll", onScroll);
+    const id = setInterval(() => setNow(londonNow()), 30000);
+    return () => clearInterval(id);
   }, []);
+  return now;
+}
 
+// Adds .is-in to .reveal elements as they scroll into view
+function useReveal() {
+  useEffect(() => {
+    const io = new IntersectionObserver(
+      (entries) =>
+        entries.forEach((e) => {
+          if (e.isIntersecting) {
+            e.target.classList.add("is-in");
+            io.unobserve(e.target);
+          }
+        }),
+      { threshold: 0.2 },
+    );
+    document.querySelectorAll(".reveal").forEach((el) => io.observe(el));
+    return () => io.disconnect();
+  }, []);
+}
+
+function Logo() {
   return (
-    <header className={`header${scrolled ? " is-scrolled" : ""}${open ? " is-open" : ""}`}>
-      <a href="#top" className="logo" onClick={() => setOpen(false)}>
-        {business.name}
-        <span>Bagel Bakery</span>
+    <span className="wordmark">
+      R<Bagel size={30} seed={3} className="wordmark-o" />
+      ni's
+    </span>
+  );
+}
+
+function LiveStrip({ now }) {
+  const text = liveMessage(liveMessages, fridayMessage, now);
+  return (
+    <div className="live-strip" role="status">
+      <span className="pulse" aria-hidden="true" />
+      <span className="mono">{formatTime(now.minutes)} in London</span>
+      {text && <span className="live-text">— {text}</span>}
+    </div>
+  );
+}
+
+function Header() {
+  const [open, setOpen] = useState(false);
+  const close = () => setOpen(false);
+  return (
+    <header className={`header${open ? " is-open" : ""}`}>
+      <a href="#top" className="logo" onClick={close} aria-label={`${business.fullName} — home`}>
+        <Logo />
       </a>
       <nav className="nav" aria-label="Main">
         {NAV.map((item) => (
-          <a key={item.href} href={item.href} onClick={() => setOpen(false)}>
+          <a key={item.href} href={item.href} onClick={close}>
             {item.label}
           </a>
         ))}
-        <a className="btn btn-small" href={business.onlineOrderUrl} target="_blank" rel="noreferrer">
+        <a className="btn" href={business.onlineOrderUrl} target="_blank" rel="noreferrer">
           Order online
         </a>
       </nav>
-      <button className="menu-toggle" aria-label="Toggle menu" aria-expanded={open} onClick={() => setOpen(!open)}>
-        <span />
-        <span />
+      <button className="menu-toggle" aria-label="Menu" aria-expanded={open} onClick={() => setOpen(!open)}>
+        {open ? "Close" : "Menu"}
       </button>
     </header>
   );
 }
 
 function Hero() {
+  const pitRef = useRef(null);
   return (
-    <section className="hero" id="top">
-      <div className="hero-bg">
-        {/* ThreeUI Community background, recoloured to warm oven tones */}
-        <RibbonFieldBackground hue={175} saturation={0.85} brightness={1.05} opacity={0.9} speed={0.6} />
-      </div>
-      <div className="hero-inner">
-        <div className="hero-copy">
-          <p className="eyebrow">North London · Since 1989</p>
-          <h1>
-            Proper bagels,
-            <br />
-            <em>boiled &amp; baked.</em>
-          </h1>
-          <p className="lede">{business.intro}</p>
-          <div className="hero-actions">
-            <a className="btn" href={business.onlineOrderUrl} target="_blank" rel="noreferrer">
-              Order online
-            </a>
-            <a className="btn btn-ghost" href="#stores">
-              Find a store
-            </a>
-          </div>
-        </div>
-        <div className="hero-visual">
-          <Suspense fallback={null}>
-            <Bagel3D />
-          </Suspense>
+    <section className="hero" id="top" ref={pitRef}>
+      <div className="hero-copy" data-solid>
+        <p className="mono label">Est. {business.established} · North London</p>
+        <h1>
+          Bagels, done the{" "}
+          <span className="marked draw">
+            proper
+            <Underline />
+          </span>{" "}
+          way.
+        </h1>
+        <p className="hero-intro">{business.intro}</p>
+        <div className="actions">
+          <a className="btn btn-big" href={business.onlineOrderUrl} target="_blank" rel="noreferrer">
+            Order online
+          </a>
+          <a className="link" href="#stores">
+            Find your nearest shop →
+          </a>
         </div>
       </div>
+      <p className="hint hand draw" aria-hidden="true">
+        <span className="hint-mouse">go on — grab one &amp; throw it</span>
+        <span className="hint-touch">tap a bagel!</span>
+        <Arrow />
+      </p>
+      <BagelPit hostRef={pitRef} />
     </section>
   );
 }
 
-function Marquee() {
-  const row = [...marquee, ...marquee];
-  return (
-    <div className="marquee" aria-hidden="true">
-      <div className="marquee-track">
-        {row.map((text, i) => (
-          <span key={i}>
-            {text}
-            <i>✦</i>
-          </span>
-        ))}
-      </div>
-    </div>
-  );
-}
-
 function Menu() {
-  const [active, setActive] = useState(0);
-  const current = menu[active];
   return (
     <section className="section" id="menu">
-      <div className="section-head">
-        <p className="eyebrow">The menu</p>
-        <h2>Made fresh, every morning</h2>
+      <div className="section-head reveal">
+        <p className="mono label">The menu</p>
+        <h2>What's on the counter</h2>
+        <div className="picks" aria-hidden="true">
+          {["plain", "sesame", "poppy"].map((v, i) => (
+            <figure key={v} className="pick">
+              <Bagel size={96} variant={v} seed={40 + i} />
+              <figcaption className="hand">{v}</figcaption>
+            </figure>
+          ))}
+        </div>
       </div>
-      <div className="tabs" role="tablist">
-        {menu.map((cat, i) => (
-          <button key={cat.category} role="tab" aria-selected={i === active} className={i === active ? "is-active" : ""} onClick={() => setActive(i)}>
-            {cat.category}
-          </button>
-        ))}
-      </div>
-      <div className="menu-grid" key={current.category}>
-        {current.items.map((item) => (
-          <article className="menu-card" key={item.name}>
-            {item.image && <img src={item.image} alt={item.name} loading="lazy" />}
-            <div className="menu-card-top">
-              <h3>{item.name}</h3>
-              {item.price && <span className="price">{item.price}</span>}
-            </div>
-            {item.description && <p>{item.description}</p>}
-            {item.tags?.length > 0 && (
-              <div className="tags">
-                {item.tags.map((tag) => (
-                  <span key={tag}>{tag}</span>
-                ))}
-              </div>
-            )}
-          </article>
+      <div className="board reveal">
+        {menu.map((cat) => (
+          <div className="board-col" key={cat.category}>
+            <h3>{cat.category}</h3>
+            <ul>
+              {cat.items.map((item) => (
+                <li key={item.name} className="item">
+                  <div className="item-line">
+                    <span className="item-name">{item.name}</span>
+                    {item.note && <span className="hand margin-note">← {item.note}</span>}
+                    {item.tags?.map((tag) => (
+                      <span key={tag} className={`sticker${tag === "Bestseller" ? " sticker-red" : ""}`}>
+                        {tag}
+                      </span>
+                    ))}
+                    {item.price && (
+                      <>
+                        <span className="dots" aria-hidden="true" />
+                        <span className="price">{item.price}</span>
+                      </>
+                    )}
+                  </div>
+                  {item.description && <p>{item.description}</p>}
+                </li>
+              ))}
+            </ul>
+          </div>
         ))}
       </div>
     </section>
@@ -143,98 +174,119 @@ function Menu() {
 
 function Occasions() {
   return (
-    <section className="section occasions" id="occasions">
+    <section className="occasions" id="occasions">
       <div className="occasions-inner">
-        <div>
-          <p className="eyebrow">Cakes · Platters · Catering</p>
+        <div className="reveal">
+          <p className="mono label">Cakes · platters · catering</p>
           <h2>{occasions.heading}</h2>
-          <p className="lede">{occasions.intro}</p>
-          <a className="btn" href={occasions.ctaUrl} target="_blank" rel="noreferrer">
+          <p className="big-text">{occasions.intro}</p>
+          <a className="btn btn-big btn-paper" href={occasions.ctaUrl} target="_blank" rel="noreferrer">
             {occasions.ctaLabel}
           </a>
         </div>
-        <div className="occasion-list">
-          {occasions.items.map((item, i) => (
-            <div className="occasion" key={item.title}>
-              <span className="num">0{i + 1}</span>
-              <div>
-                <h3>{item.title}</h3>
-                <p>{item.description}</p>
-              </div>
-            </div>
-          ))}
+        <div className="receipt reveal" aria-label="What we cater">
+          <p className="receipt-title">{business.fullName.toUpperCase()}</p>
+          <p className="receipt-sub">EST. {business.established} · NORTH LONDON</p>
+          <p className="receipt-rule">ORDER FOR ANY OCCASION</p>
+          <ul>
+            {occasions.items.map((item) => (
+              <li key={item}>
+                <span>1 × {item}</span>
+                <span>✓</span>
+              </li>
+            ))}
+          </ul>
+          <p className="receipt-total">
+            <span>TOTAL</span>
+            <span>one happy crowd</span>
+          </p>
+          <p className="receipt-thanks">*** THANK YOU ***</p>
+          <div className="barcode" aria-hidden="true" />
         </div>
       </div>
     </section>
   );
 }
 
-function Stores() {
+function Stores({ now }) {
   return (
     <section className="section" id="stores">
-      <div className="section-head">
-        <p className="eyebrow">Visit us</p>
-        <h2>{stores.length} stores across North London</h2>
+      <div className="section-head reveal">
+        <p className="mono label">Come and say hello</p>
+        <h2>
+          {stores.length} shops, <em>one bagel.</em>
+        </h2>
       </div>
-      <div className="store-grid">
-        {stores.map((store) => (
-          <article className="store-card" key={store.name}>
-            <h3>{store.name}</h3>
-            {store.since && <p className="since">{store.since}</p>}
-            {store.address && <p>{store.address}</p>}
-            {store.phone && (
-              <p>
-                <a href={`tel:${store.phone.replace(/\s/g, "")}`}>{store.phone}</a>
-              </p>
-            )}
-            {store.hours?.length > 0 && (
-              <dl className="hours">
-                {store.hours.map((h) => (
-                  <div key={h.days}>
-                    <dt>{h.days}</dt>
-                    <dd>{h.time}</dd>
-                  </div>
-                ))}
-              </dl>
-            )}
-            <div className="store-links">
-              <a href={mapsUrl(store)} target="_blank" rel="noreferrer">
-                Directions →
-              </a>
-              {store.deliveroo && (
-                <a href={store.deliveroo} target="_blank" rel="noreferrer">
-                  Deliveroo →
+      <ol className="store-list">
+        {stores.map((store, i) => {
+          const status = storeStatus(store.hours, now);
+          return (
+            <li className="store reveal" key={store.name}>
+              <span className="mono store-num">{String(i + 1).padStart(2, "0")}</span>
+              <div className="store-name">
+                <h3>{store.name}</h3>
+                {store.note && <span className="hand">{store.note}</span>}
+              </div>
+              <div className="store-info">
+                {status && (
+                  <span className={`status${status.open ? " is-open" : ""}`}>
+                    <i aria-hidden="true" />
+                    {status.label}
+                  </span>
+                )}
+                {store.address && <span>{store.address}</span>}
+                {store.phone && <a href={`tel:${store.phone.replace(/\s/g, "")}`}>{store.phone}</a>}
+              </div>
+              <div className="store-links">
+                <a href={mapsUrl(store)} target="_blank" rel="noreferrer">
+                  Directions
                 </a>
-              )}
-            </div>
-          </article>
-        ))}
-      </div>
+                {store.deliveroo && (
+                  <a href={store.deliveroo} target="_blank" rel="noreferrer">
+                    Deliveroo
+                  </a>
+                )}
+              </div>
+            </li>
+          );
+        })}
+      </ol>
     </section>
   );
 }
 
 function Story() {
+  const parts = story.headline.split(/\[(.+?)\]/);
   return (
     <section className="section story" id="story">
-      <div className="story-inner">
-        <div>
-          <p className="eyebrow">Our story</p>
-          <h2>{story.heading}</h2>
-        </div>
-        <div>
-          {story.paragraphs.map((p) => (
-            <p key={p.slice(0, 20)}>{p}</p>
-          ))}
-          <div className="stats">
-            {story.stats.map((s) => (
-              <div key={s.label}>
-                <strong>{s.value}</strong>
-                <span>{s.label}</span>
-              </div>
-            ))}
-          </div>
-        </div>
+      <div className="stamp" aria-hidden="true">
+        <svg viewBox="0 0 200 200">
+          <defs>
+            <path id="stamp-circle" d="M100,100 m-78,0 a78,78 0 1,1 156,0 a78,78 0 1,1 -156,0" />
+          </defs>
+          <text>
+            <textPath href="#stamp-circle">FRESH EVERY DAY · BOILED &amp; BAKED · EST. {business.established} ·</textPath>
+          </text>
+        </svg>
+        <Bagel size={92} variant="sesame" seed={11} className="stamp-bagel" />
+      </div>
+      <p className="mono label reveal">Our story</p>
+      <h2 className="story-headline reveal draw">
+        {parts.map((part, i) =>
+          i % 2 ? (
+            <span className="marked" key={i}>
+              {part}
+              <Circle />
+            </span>
+          ) : (
+            part
+          ),
+        )}
+      </h2>
+      <div className="story-body reveal">
+        {story.paragraphs.map((p) => (
+          <p key={p.slice(0, 24)}>{p}</p>
+        ))}
       </div>
     </section>
   );
@@ -243,18 +295,13 @@ function Story() {
 function Footer() {
   return (
     <footer className="footer">
-      <div className="footer-cta">
-        <h2>
-          Hungry? <em>Your bagel's waiting.</em>
-        </h2>
-        <a className="btn" href={business.onlineOrderUrl} target="_blank" rel="noreferrer">
-          Order online
-        </a>
-      </div>
-      <div className="footer-bottom">
-        <span>
-          © {new Date().getFullYear()} {business.fullName}
-        </span>
+      <div className="footer-top">
+        <p className="footer-cta">
+          Hungry yet?{" "}
+          <a href={business.onlineOrderUrl} target="_blank" rel="noreferrer">
+            Order online →
+          </a>
+        </p>
         <div className="footer-links">
           {business.instagram && (
             <a href={business.instagram} target="_blank" rel="noreferrer">
@@ -269,20 +316,29 @@ function Footer() {
           {business.email && <a href={`mailto:${business.email}`}>{business.email}</a>}
         </div>
       </div>
+      <p className="giant" aria-hidden="true">
+        R<Bagel size={200} seed={5} variant="poppy" className="giant-o" />
+        ni's
+      </p>
+      <p className="mono footer-small">
+        © {new Date().getFullYear()} {business.fullName} · Boiled &amp; baked in North London since {business.established}
+      </p>
     </footer>
   );
 }
 
 export default function App() {
+  const now = useLondonNow();
+  useReveal();
   return (
     <>
+      <LiveStrip now={now} />
       <Header />
       <main>
         <Hero />
-        <Marquee />
         <Menu />
         <Occasions />
-        <Stores />
+        <Stores now={now} />
         <Story />
       </main>
       <Footer />
