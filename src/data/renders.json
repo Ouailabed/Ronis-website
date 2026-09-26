@@ -1,0 +1,62 @@
+{
+  "bagel-hero": {
+    "src": "/renders/bagel-hero.webp",
+    "width": 1100,
+    "height": 646
+  },
+  "bagel-opened": {
+    "src": "/renders/bagel-opened.webp",
+    "width": 1096,
+    "height": 1066
+  },
+  "bagel-step-30": {
+    "src": "/renders/bagel-step-30.webp",
+    "width": 900,
+    "height": 831
+  },
+  "bagel-step-50": {
+    "src": "/renders/bagel-step-50.webp",
+    "width": 900,
+    "height": 858
+  },
+  "bagel-step-70": {
+    "src": "/renders/bagel-step-70.webp",
+    "width": 900,
+    "height": 858
+  },
+  "bagels-trio": {
+    "src": "/renders/bagels-trio.webp",
+    "width": 1200,
+    "height": 540
+  },
+  "carrot-cake": {
+    "src": "/renders/carrot-cake.webp",
+    "width": 1100,
+    "height": 796
+  },
+  "challah": {
+    "src": "/renders/challah.webp",
+    "width": 973,
+    "height": 498
+  },
+  "platter": {
+    "src": "/renders/platter.webp",
+    "width": 1200,
+    "height": 892
+  },
+  "top-plain": {
+    "src": "/renders/top-plain.webp",
+    "width": 360,
+    "height": 353
+  },
+  "top-poppy": {
+    "src": "/renders/top-poppy.webp",
+    "width": 360,
+    "height": 354
+  },
+  "top-sesame": {
+    "src": "/renders/top-sesame.webp",
+    "width": 360,
+    "height": 359
+  }
+}

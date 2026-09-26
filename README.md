@@ -1,88 +1,82 @@
-# Roni's Bagel Bakery — Website
+# Fresh from Roni's — website concept
 
-A one-page website for Roni's Bagel Bakery with a printed-paper, North London deli feel — and a few things that make it feel alive:
+A complete website concept for **Roni's Bagel Bakery** (North London, since 1989): a cinematic 3D bagel hero with a scroll-driven "food commercial", plus the practical pages people actually need — menu, locations with live opening status, ordering, catering and cakes.
 
-- **A pile of bagels you can play with.** They tumble into the top of the page; visitors can grab and throw them (or tap them on a phone). Every bagel is drawn slightly differently, like the real thing.
-- **A live strip** at the top that changes with the time in London ("Lunchtime — the hot salt beef is calling", and on Fridays: "don't forget your challah").
-- **Live "Open now / Closed" status** on every shop, worked out from the opening hours.
-- Hand-drawn underlines and notes, a menu board, and a till-receipt for cakes & platters.
-
-Built with [React](https://react.dev) + [Vite](https://vite.dev). No heavy libraries; fonts are bundled with the site (no Google Fonts tracking).
+Built with **Vite + React + TypeScript + React Router + Three.js**. No backend: it's a static site that links to Roni's real ordering destinations.
 
 ---
 
-## ✏️ Changing the text, menu, stores or hours
+## Run it
 
-**Everything you'd normally want to change is in one file: [`src/content.js`](src/content.js).**
-
-You can edit it directly on GitHub (open the file → pencil icon → edit → "Commit changes"). If the site is connected to Netlify or Vercel (see below), it updates by itself a minute later.
-
-| To change…                    | Edit this in `src/content.js` |
-| ----------------------------- | ----------------------------- |
-| Intro text, social links, email | `business`                  |
-| The red live strip messages     | `liveMessages`, `fridayMessage` |
-| Menu items, prices, stickers, handwritten notes | `menu`      |
-| Cakes / platters receipt        | `occasions`                 |
-| Shop addresses, phones, **opening hours** | `stores`          |
-| "Our story" text                | `story`                     |
-
-Tips:
-
-- Keep the `"quotes"` and the commas at the end of lines.
-- Leave something as `""` to hide it (e.g. `price: ""` shows no price).
-- Opening hours use 24-hour times, e.g. `{ days: "Mon-Fri", open: "07:00", close: "18:00" }`. Add one line per set of days. These drive the "Open now" badges, so keep them accurate.
-- Lines marked `// TODO` still need checking — some addresses, phone numbers and opening hours were not publicly available.
-
-### Adding photos
-
-1. Put the photos in `public/images/` (JPG or WebP, around 1600px wide at most).
-2. List them in `src/content.js`:
-   - `gallery`: the "From the counter" row of taped polaroids. The section stays hidden until you add one.
-   - `stores[].photo`: a shopfront polaroid that follows the mouse when someone hovers over that shop (shown as a small thumbnail on phones).
-   - `story.photo`: a polaroid next to "Our story". An old photo of the first shop would be perfect.
-
-If a photo file is missing, it hides itself instead of showing a broken image. Only use Roni's own photos or ones you have permission to use.
-
-### Changing colours
-
-The brand colours are at the top of [`src/styles.css`](src/styles.css) (`--paper`, `--ink`, `--red`, `--mustard`). Change them there and the whole site follows.
-
----
-
-## 🧑‍💻 Running it on your computer
-
-You need [Node.js](https://nodejs.org) 20 or newer.
+Requires Node.js 20+.
 
 ```bash
-npm install      # once
-npm run dev      # opens a live preview at http://localhost:5173
-npm run build    # makes the final website in the dist/ folder
+npm install
+npm run dev            # local dev server → http://localhost:5173
+npm run build          # type-check + production build → dist/
+npm run preview        # serve the production build → http://localhost:4173
+npm run test:e2e       # end-to-end checks against the build (needs Chromium, see below)
+npm run render:assets  # re-render the 3D food illustrations into public/renders
 ```
 
-## 🚀 Putting it online
+`test:e2e` and `render:assets` use Chromium through `playwright-core`. If Chromium isn't at `/opt/pw-browsers/chromium`, set `CHROMIUM_PATH=/path/to/chrome`.
 
-The site is a plain static website, so it can be hosted free on any of these:
+## What's on the site
 
-- **Netlify** — "Add new site → Import from GitHub", pick this repo. Build command `npm run build`, publish directory `dist`.
-- **Vercel** — "New Project → Import" this repo. It detects Vite automatically.
-- **Anywhere else** — run `npm run build` and upload the contents of `dist/`.
+| Page | What it does |
+| --- | --- |
+| **Home** (`/`) | 3D bagel hero (headline + *Order now* / *Find your Roni's* visible instantly) → scroll story where the bagel opens and the cream cheese and smoked salmon go on → product showcase → story → catering → bakery finder → interactive finale. |
+| **Menu** (`/menu`) | Filter by category (synced to `?category=`), search, Roni's favourites highlighted. |
+| **Locations** (`/locations`, `/locations/:slug`) | Live *Open now / Closed · opens 7am* (London time), schematic map, directions (Google/Apple Maps), call, order options per shop. |
+| **Catering** (`/catering`) | 48-hour lead time explained, live "earliest collection" time, platter planner (guests → platters → guide price). |
+| **Cakes**, **About**, **Contact** | Verified copy only; contact is by phone per shop (no fake forms). |
+| **Order now** (header, mobile bar, everywhere) | A dialog that asks *which Roni's* first, then shows that shop's real options: Roni's online ordering, that shop's own Deliveroo listing (where one exists), its phone number, and catering. |
 
-Then point `ronisonline.co.uk` at it from the host's "Domains" settings.
+## Editing business details
 
----
+**All facts live in [`src/data/business.ts`](src/data/business.ts)** — locations, hours, phone numbers, ordering links, menu, catering and story. Pages, the order dialog, structured data (SEO) and "Open now" badges all read from it.
+
+- Hours use 24-hour times: `{ days: "Mon-Sun", open: "07:00", close: "20:00" }`. `close: "24:00"` means midnight.
+- Leave `hours: []` if a shop's hours aren't confirmed — the site says "please call" instead of guessing.
+- `deliveroo: ""` hides the delivery option for that shop.
+- `approx` coordinates are only for the schematic map, never for navigation.
+
+[`VERIFICATION.md`](VERIFICATION.md) lists where each fact came from and what still needs confirming.
+
+## Images
+
+There are no Roni's photographs in this repo. Every food image is a **digital illustration rendered from the site's own 3D models** and is labelled "Illustration" on the page. See [`ASSETS.md`](ASSETS.md) for the full list and exactly where to drop in real photography.
+
+## How the 3D works
+
+- `src/three/bagel.ts` — procedural bagel: lumpy, flat-bottomed ring; crust colour/normal/gloss maps; sesame or poppy seeds; splits into halves with a crumb face.
+- `src/three/ingredients.ts`, `bakes.ts` — cream cheese, folded smoked salmon, challah, carrot cake, platter.
+- `src/three/BagelShow.ts` — the hero/scroll scene. The **`TIMELINE`** at the top controls when the bagel opens and when each ingredient lands.
+- `src/components/BagelShow.tsx` — shows a still image instantly, lazy-loads three.js after first paint, generates textures in a Web Worker, then crossfades to the live scene. Pauses when off-screen; follows the pointer on desktop and sways gently on touch screens.
+- **Fallbacks:** reduced motion → a short sequence of still images; no WebGL → still images. The page is fully usable either way, and a *Skip the bagel* link jumps past the scene.
+
+## Deploying
+
+It's a static single-page app.
+
+- **Netlify:** build `npm run build`, publish `dist` (`public/_redirects` handles routes).
+- **Vercel:** import the repo; `vercel.json` handles routes.
+- Set **`VITE_SITE_URL`** (e.g. `https://www.ronisonline.co.uk`) at build time so social previews and canonical URLs are absolute.
+- Structured data (schema.org `Bakery`) for every shop is written into the static HTML at build time. For the best SEO, consider pre-rendering routes once the content is final.
 
 ## Project layout
 
 ```
-src/content.js              ← all words, menu, stores (edit this!)
-src/styles.css              ← colours, fonts, layout
-src/App.jsx                 ← the page sections
-src/components/BagelPit.jsx ← the bagels you can throw (physics)
-src/lib/bagel.js            ← how each bagel is drawn
-src/lib/time.js             ← London time, "Open now" logic
-public/images/              ← photos go here
+src/data/business.ts        ← every business fact (edit here)
+src/data/renders.json       ← generated sizes of the rendered images
+src/pages/                  ← Home, Menu, Locations, LocationDetail, Catering, Cakes, About, Contact
+src/components/             ← Header, Footer, OrderDialog, BagelShow, LocationFinder, BagelToss…
+src/three/                  ← 3D models, textures (worker), scenes, offline "studio"
+src/styles/                 ← base tokens, layout, home, pages
+scripts/render-assets.mjs   ← renders the 3D models to public/renders/*.webp
+tests/e2e.mjs               ← end-to-end checks
 ```
 
-## Credits & licences
+## Credits
 
-- Fonts: Fraunces, DM Mono and Caveat, bundled via Fontsource — SIL Open Font Licence.
+Fonts: Fraunces and Instrument Sans (SIL Open Font Licence), self-hosted via Fontsource. 3D: three.js (MIT). All food illustrations are original renders made for this project.
