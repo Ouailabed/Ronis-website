@@ -93,13 +93,13 @@ try {
   await page.goto(BASE + "/menu", { waitUntil: "networkidle" });
   await page.keyboard.press("Tab");
   ok((await page.evaluate(() => document.activeElement?.textContent)) === "Skip to content", "first Tab reaches the skip link");
-  const orderBtn = page.locator(".nav-order");
+  const orderBtn = page.locator(".header-actions .btn");
   await orderBtn.focus();
   await page.keyboard.press("Enter");
   await page.waitForTimeout(300);
   ok(await page.locator("dialog.order-dialog[open]").isVisible(), "Enter on “Order now” opens the order dialog");
   ok(await page.evaluate(() => !!document.activeElement?.closest("dialog")), "focus moves into the dialog");
-  await page.locator("dialog").getByRole("button", { name: /Muswell Hill/ }).focus();
+  await page.getByRole("button", { name: /Muswell Hill/ }).focus();
   await page.keyboard.press("Enter");
   await page.waitForTimeout(200);
   const optionHrefs = await page.locator(".order-options a").evaluateAll((as) => as.map((a) => a.getAttribute("href")));
@@ -107,7 +107,7 @@ try {
   ok(optionHrefs.includes("https://deliveroo.co.uk/menu/london/muswell-hill/ronis"), "Muswell Hill shows its own Deliveroo listing");
   ok(optionHrefs.includes("tel:+442088294999"), "Muswell Hill shows its phone number");
   await page.getByRole("button", { name: "Choose a different shop" }).click();
-  await page.locator("dialog").getByRole("button", { name: /Swains Lane/ }).click();
+  await page.getByRole("button", { name: /Swains Lane/ }).click();
   const swains = await page.locator(".order-options a").evaluateAll((as) => as.map((a) => a.getAttribute("href")));
   ok(!swains.some((h) => h.includes("deliveroo")), "Swains Lane (no Deliveroo listing) shows no delivery option");
   await page.keyboard.press("Escape");
@@ -116,15 +116,15 @@ try {
 
   /* ------------------------------------------------ menu filtering */
   await page.goto(BASE + "/menu", { waitUntil: "networkidle" });
-  const all = await page.locator(".menu-list li:not(.menu-list-note)").count();
+  const all = await page.locator(".menu-items li").count();
   await page.getByRole("button", { name: "Platters", exact: true }).click();
   await page.waitForURL("**category=platters");
   await page.waitForTimeout(200);
-  const platters = await page.locator(".menu-list li:not(.menu-list-note)").count();
+  const platters = await page.locator(".menu-items li").count();
   ok(platters > 0 && platters < all && page.url().includes("category=platters"), `category filter works (${all} → ${platters}) and updates the URL`);
   await page.getByRole("button", { name: "Everything" }).click();
   await page.getByRole("searchbox").fill("salmon");
-  const salmon = await page.locator(".menu-list li:not(.menu-list-note)").count();
+  const salmon = await page.locator(".menu-items li").count();
   ok(salmon >= 1 && salmon < all, `search narrows the menu (“salmon” → ${salmon})`);
   await page.getByRole("searchbox").fill("zzzz");
   ok(await page.getByText("Show the whole menu").isVisible(), "no-results state offers a way back");
@@ -134,95 +134,54 @@ try {
   // keyboard on the slider: 30 guests + 14 steps of 5 = 100 guests → 200 minis → 8 platters of 25
   await page.locator("#guests").focus();
   for (let i = 0; i < 14; i += 1) await page.keyboard.press("ArrowRight");
-  ok(/^8 platters/.test(await page.locator(".planner-result").innerText()), "platter planner (keyboard): 100 guests × 2 minis = 8 platters");
-  ok(/Place your order by/i.test(await page.locator(".ep-result").innerText()), "event planner shows an order-by deadline");
+  ok(/^8 mini bagel platters/.test(await page.locator(".planner-result").innerText()), "platter planner (keyboard): 100 guests × 2 minis = 8 platters");
+  ok(/Place your order by/.test(await page.locator(".ep-result").innerText()), "event planner shows an order-by deadline");
   await page.locator("#ep-date").fill(new Date().toISOString().slice(0, 10));
   ok(/less than 48 hours/i.test(await page.locator(".ep-result").innerText()), "event planner warns when the event is under 48 hours away");
   await page.close();
 
-  /* ------------------------------------------------ home: hero, bagels, visit, scroll */
+  /* ------------------------------------------------ home hero: buttons immediately, 3D loads */
   const home = await browser.newPage({ viewport: { width: 1440, height: 900 } });
   await home.goto(BASE + "/", { waitUntil: "domcontentloaded" });
-  ok(await home.locator(".hero").getByRole("button", { name: "Order now" }).isVisible(), "hero “Order now” is visible straight away");
-  ok(await home.locator(".nav-order").isVisible(), "the header Order button is always there");
-  await home.waitForLoadState("networkidle");
-  ok(await home.locator(".hero-frame img").evaluate((i) => i.complete && i.naturalWidth > 0 && i.loading === "eager"), "hero photograph loads eagerly");
-  ok(/open now|closed right now/i.test(await home.locator(".nav-live").innerText()), "header shows live opening status");
-  await home.locator("#bagels").scrollIntoViewIfNeeded();
-  await home.locator(".bagels-item").nth(2).hover();
-  await home.waitForTimeout(400);
-  ok((await home.locator(".bagels-photo").nth(2).getAttribute("class")).includes("is-active"), "pointing at a bagel swaps the large photograph");
-  ok(/03 \/ 07/.test(await home.locator(".bagels-count").innerText()), "photo counter follows the chosen item");
-  ok(/Tuna mix & cucumber/.test(await home.locator(".bagels-detail h3").innerText()), "name and description follow the chosen item");
-  await home.locator("#visit").scrollIntoViewIfNeeded();
-  await home.locator(".visit-tabs button", { hasText: "Muswell Hill" }).click();
-  ok(/348 Muswell Hill Broadway/.test(await home.locator(".visit-address").innerText()), "choosing a bakery shows its address");
-  ok(/Muswell/.test((await home.locator(".visit-actions a").first().getAttribute("href")) ?? ""), "Get directions points at the chosen bakery");
-  await home.evaluate(() => window.scrollTo(0, 0));
-  await home.waitForTimeout(600);
-  const clip0 = await home.locator(".hero-frame").evaluate((el) => getComputedStyle(el).clipPath);
-  await home.evaluate(() => window.scrollTo(0, window.innerHeight * 0.6));
-  await home.waitForTimeout(1200);
-  const clip1 = await home.locator(".hero-frame").evaluate((el) => getComputedStyle(el).clipPath);
-  ok(clip0 !== clip1, `hero photograph pulls in as the page scrolls (${clip0} → ${clip1})`);
-  ok((await home.locator("canvas").count()) === 0, "no WebGL canvas on the page (photography only)");
+  ok(await home.getByRole("button", { name: "Order now" }).nth(1).isVisible(), "hero “Order now” is visible straight away");
+  ok(await home.getByRole("link", { name: "Find your Roni's" }).first().isVisible(), "hero “Find your Roni's” is visible straight away");
+  await home.waitForSelector(".show.is-ready", { timeout: 30000 }).catch(() => null);
+  ok((await home.locator(".show.is-ready canvas").count()) === 1, "3D scene loads and takes over from the still image");
   await home.close();
 
   /* ------------------------------------------------ reduced motion */
   const rm = await browser.newPage({ viewport: { width: 1280, height: 800 }, reducedMotion: "reduce" });
   await rm.goto(BASE + "/", { waitUntil: "networkidle" });
-  ok((await rm.locator(".hero-frame .photo").evaluate((el) => getComputedStyle(el).animationName)) === "none", "reduced motion: no hero intro animation");
-  await rm.evaluate(() => window.scrollTo(0, window.innerHeight));
-  await rm.waitForTimeout(300);
-  ok((await rm.locator(".hero-frame").evaluate((el) => getComputedStyle(el).clipPath)) === "none", "reduced motion: no scroll-linked effects");
-  ok((await rm.locator(".bagels-head .line > span").first().evaluate((el) => getComputedStyle(el).transform)) === "none", "reduced motion: headlines are simply there");
+  ok((await rm.locator(".show.is-static").count()) === 1 && (await rm.locator(".show canvas").count()) === 0, "reduced motion: no 3D scroll scene, static sequence instead");
+  ok((await rm.locator(".show-sequence img").count()) === 3, "reduced motion: the bagel story is shown as three stills");
   await rm.close();
 
   /* ------------------------------------------------ mobile */
   const m = await browser.newPage({ viewport: { width: 390, height: 844 }, isMobile: true, hasTouch: true });
   await m.goto(BASE + "/", { waitUntil: "networkidle" });
-  ok(await m.locator(".nav-order").isVisible(), "mobile: header shows Order");
-  ok(!(await m.locator(".nav-links").isVisible()), "mobile: no crowded links in the bar");
-  ok(/hero-tall/.test(await m.locator(".hero-frame img").evaluate((i) => i.currentSrc)), "mobile: hero uses the tall crop");
-  await m.locator(".nav").getByRole("button", { name: "Menu" }).click();
-  ok(await m.locator("#site-menu").isVisible(), "mobile: Menu opens the full-screen menu");
-  await m.locator("#site-menu a", { hasText: "Location" }).click();
+  ok(await m.locator(".mobile-bar").isVisible(), "mobile: sticky Order / Find bar is visible");
+  await m.locator(".menu-toggle").click();
+  ok(await m.locator("#mobile-menu").isVisible(), "mobile: menu button opens navigation");
+  await m.locator("#mobile-menu a", { hasText: "Locations" }).click();
   await m.waitForURL("**/locations");
-  await m.waitForTimeout(600);
-  ok(!(await m.locator("#site-menu").isVisible()), "mobile: choosing a page closes the menu");
-  await m.goto(BASE + "/", { waitUntil: "networkidle" });
-  await m.locator("#bagels").scrollIntoViewIfNeeded();
-  await m.locator(".bagels-item").nth(1).tap();
-  await m.waitForTimeout(300);
-  ok(/Hot salt beef/.test(await m.locator(".bagels-detail h3").innerText()), "mobile: tapping an item swaps the photo and details");
-  const btnHeights = await m.locator(".btn").evaluateAll((bs) => bs.filter((b) => b.offsetParent).map((b) => b.getBoundingClientRect().height));
-  ok(btnHeights.every((hh) => hh >= 40), `mobile: buttons are comfortably tappable (min ${Math.min(...btnHeights).toFixed(0)}px)`);
+  await m.waitForTimeout(1000);
+  ok(!(await m.locator("#mobile-menu").isVisible()), "mobile: navigating closes the menu");
+  const overflow = await m.evaluate(() => document.documentElement.scrollWidth - window.innerWidth);
+  ok(overflow <= 0, `mobile: no horizontal overflow (${overflow}px)`);
   await m.close();
-
-  /* ------------------------------------------------ no horizontal overflow at any size */
-  for (const w of [375, 390, 430, 768, 1024, 1440, 1920]) {
-    const pg = await browser.newPage({ viewport: { width: w, height: 900 }, reducedMotion: "reduce" });
-    const wide = [];
-    for (const route of ["/", "/menu", "/locations", "/locations/west-hampstead", "/catering", "/cakes", "/about", "/contact"]) {
-      await pg.goto(BASE + route, { waitUntil: "networkidle" });
-      const over = await pg.evaluate(() => document.documentElement.scrollWidth - window.innerWidth);
-      if (over > 0) wide.push(`${route} +${over}px`);
-    }
-    ok(wide.length === 0, `${w}px: no horizontal overflow${wide.length ? ` (${wide.join(", ")})` : ""}`);
-    await pg.close();
-  }
 } finally {
   await browser.close();
 }
 
-/* ------------------------------------------------ no WebGL at all: nothing changes */
+/* ------------------------------------------------ no WebGL: still images */
 const noGl = await chromium.launch({ executablePath: EXE, args: ["--disable-webgl", "--disable-3d-apis"] });
 try {
   const p = await noGl.newPage({ viewport: { width: 1280, height: 800 } });
   const errors = [];
   p.on("pageerror", (e) => errors.push(e.message));
   await p.goto(BASE + "/", { waitUntil: "networkidle" });
-  ok(await p.locator(".hero-frame img").isVisible(), "no WebGL: hero photograph is shown");
+  ok((await p.locator(".show.is-static").count()) === 1, "no WebGL: falls back to the static scene");
+  ok(await p.locator(".show-still").isVisible(), "no WebGL: hero still image is shown");
   ok(errors.length === 0, "no WebGL: no page errors");
 } finally {
   await noGl.close();

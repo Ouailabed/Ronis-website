@@ -53,10 +53,10 @@ export default function EventPlanner() {
   };
 
   return (
-    <div className="panel event-planner">
+    <div className="event-planner">
       <div className="ep-head">
         <Calendar />
-        <h3 className="serif">When's your event?</h3>
+        <h3>When's your event?</h3>
       </div>
       <div className="ep-fields">
         <label htmlFor="ep-date">
@@ -73,21 +73,20 @@ export default function EventPlanner() {
           {result.late ? (
             <>
               <p className="ep-label">That's less than 48 hours away</p>
-              <p className="ep-date serif">Call the shop you'll collect from</p>
+              <p className="ep-date">Call the shop you'll collect from</p>
               <p className="small">{catering.lastMinute}</p>
             </>
           ) : (
             <>
               <p className="ep-label">Place your order by</p>
-              <p className="ep-date serif">
-                {fmt(result.orderBy, { weekday: "long", day: "numeric", month: "long" })},{" "}
-                {fmt(result.orderBy, { hour: "numeric", minute: "2-digit", hour12: true }).replace(" ", "")}
+              <p className="ep-date">
+                {fmt(result.orderBy, { weekday: "long", day: "numeric", month: "long" })}, {fmt(result.orderBy, { hour: "numeric", minute: "2-digit", hour12: true }).replace(" ", "")}
               </p>
               <div className="ep-actions">
-                <a className="btn btn-sm" href={ordering.catering} target="_blank" rel="noopener">
+                <a className="btn btn-small" href={ordering.catering} target="_blank" rel="noopener">
                   Order catering <ArrowUpRight />
                 </a>
-                <button className="btn btn-sm btn-line" onClick={downloadReminder}>
+                <button className="btn btn-small btn-ghost" onClick={downloadReminder}>
                   Add a reminder to my calendar
                 </button>
               </div>
@@ -95,10 +94,7 @@ export default function EventPlanner() {
           )}
         </div>
       )}
-      <p className="small muted ep-note">
-        Earliest possible collection if you order now: {fmt(minDate, { weekday: "short", day: "numeric", month: "short" })},{" "}
-        {fmt(minDate, { hour: "numeric", minute: "2-digit", hour12: true }).replace(" ", "")}.
-      </p>
+      <p className="small ep-note">Earliest possible collection if you order now: {fmt(minDate, { weekday: "short", day: "numeric", month: "short" })}, {fmt(minDate, { hour: "numeric", minute: "2-digit", hour12: true }).replace(" ", "")}.</p>
     </div>
   );
 }

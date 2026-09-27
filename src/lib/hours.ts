@@ -107,10 +107,3 @@ export const directionsUrl = (l: Location) =>
 export const appleMapsUrl = (l: Location) => `https://maps.apple.com/?q=${encodeURIComponent(`Roni's, ${fullAddress(l)}`)}`;
 
 export const telHref = (phone: string) => `tel:+44${phone.replace(/\s/g, "").replace(/^0/, "")}`;
-
-/** Today's opening times as text ("7am – midnight"), or null if not open today / not published. */
-export function todayHours(hours: Hours[], now: LondonNow = londonNow()) {
-  const w = windows(hours, now.day);
-  if (!w.length) return null;
-  return w.map(([o, c]) => `${formatTime(o)} – ${formatTime(c)}`).join(", ");
-}

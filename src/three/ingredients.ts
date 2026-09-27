@@ -72,12 +72,12 @@ export function createCreamCheese(seed = 3, detail = 1, maps?: SurfaceMaps) {
  * One folded slice of smoked salmon, draped along an arc of the ring.
  * `start` = angle where the slice begins, `span` = arc length in radians.
  */
-export function createSalmonSlice(seed: number, start: number, span = 1.3, detail = 1, sharedMat?: THREE.Material, widthScale = 1) {
+export function createSalmonSlice(seed: number, start: number, span = 1.3, detail = 1, sharedMat?: THREE.Material) {
   const rand = mulberry32(seed);
   const n = createNoise3(seed + 5);
   const folds = 2 + Math.floor(rand() * 2); // accordion folds along the slice
   const phase = rand() * 0.6;
-  const width = (0.5 + rand() * 0.14) * widthScale;
+  const width = 0.5 + rand() * 0.14;
   const lift = 0.1 + rand() * 0.06;
   const geo = gridSurface(Math.round(110 * detail), Math.round(20 * detail), (u, v) => {
     const th = start + u * span;
@@ -93,9 +93,7 @@ export function createSalmonSlice(seed: number, start: number, span = 1.3, detai
     const taper = Math.sin(Math.PI * Math.min(1, Math.max(0, u * 1.08 - 0.04)));
     const wob = n(u * 5, v * 4, seed) * 0.018;
     const r = 1.04 + across * (0.85 + 0.15 * taper) + bunch;
-    let y = 0.015 + crest * lift * (0.4 + 0.6 * taper) + droop + wob;
-    // anything hanging past the crust flops down over the edge
-    if (r > 1.4) y -= (r - 1.4) * 1.6;
+    const y = 0.015 + crest * lift * (0.4 + 0.6 * taper) + droop + wob;
     return new THREE.Vector3(Math.cos(th) * r, y, Math.sin(th) * r);
   });
   const mesh = new THREE.Mesh(geo, sharedMat);

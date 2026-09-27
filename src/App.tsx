@@ -1,12 +1,13 @@
-import "@fontsource-variable/archivo/wdth.css";
-import "@fontsource-variable/fraunces/full-italic.css";
-import "@fontsource-variable/fraunces/full.css";
+import "@fontsource/gloock/400.css";
+import "@fontsource-variable/instrument-sans/index.css";
 import "./styles/base.css";
 import "./styles/layout.css";
 import "./styles/home.css";
 import "./styles/pages.css";
 import { lazy, Suspense, useEffect, useLayoutEffect } from "react";
 import { Route, Routes, useLocation } from "react-router-dom";
+import Cursor from "./components/Cursor";
+import ScrollExtras from "./components/ScrollExtras";
 import Footer from "./components/Footer";
 import Header from "./components/Header";
 import OrderDialog from "./components/OrderDialog";
@@ -43,11 +44,15 @@ function Shell() {
   const { pathname } = useLocation();
   useReveal();
   useEffect(() => startSmoothScroll(), []);
+  useEffect(() => {
+    // pages other than home have no intro, so their entrance animations can play straight away
+    if (pathname !== "/") document.documentElement.classList.add("intro-done");
+  }, [pathname]);
   return (
     <>
       <ScrollManager />
       <Header />
-      <main id="main" key={pathname} className={`page-enter${pathname === "/" ? " is-home" : ""}`} tabIndex={-1}>
+      <main id="main" key={pathname} className="page-enter" tabIndex={-1}>
         <Suspense fallback={<div className="page-loading" aria-busy="true" />}>
           <Routes>
             <Route path="/" element={<Home />} />
@@ -64,6 +69,8 @@ function Shell() {
       </main>
       <Footer />
       <OrderDialog />
+      <Cursor />
+      <ScrollExtras />
     </>
   );
 }

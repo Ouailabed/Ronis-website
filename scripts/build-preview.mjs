@@ -11,7 +11,7 @@ execSync("npx vite build --outDir dist-preview --emptyOutDir", { stdio: "inherit
 const html = readFileSync("dist-preview/index.html", "utf8");
 const head = html.match(/<head>([\s\S]*?)<\/head>/)[1];
 const body = html.match(/<body>([\s\S]*?)<\/body>/)[1];
-const title = "<title>Roni's Bagel Bakery</title>"; // the preview's name in the gallery
+const title = "<title>Fresh from Roni's</title>"; // the preview's name in the gallery
 const keep = head
   .replace(/<title>[\s\S]*?<\/title>/, "")
   .replace(/<meta charset[^>]*>/, "")

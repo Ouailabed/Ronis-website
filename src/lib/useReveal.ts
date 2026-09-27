@@ -1,16 +1,13 @@
 import { useEffect } from "react";
 
-const SELECTOR = ".reveal, .reveal-lines, .reveal-photo";
-
 /**
- * Adds .is-in to .reveal / .reveal-lines / .reveal-photo elements as they enter the viewport
- * (the CSS in base.css decides what that looks like). Watches the DOM, so it
+ * Fades .reveal elements in as they enter the viewport. Watches the DOM, so it
  * also works for lazily loaded pages that mount after navigation.
  */
 export function useReveal() {
   useEffect(() => {
     if (!("IntersectionObserver" in window)) {
-      const showAll = () => document.querySelectorAll(SELECTOR).forEach((el) => el.classList.add("is-in"));
+      const showAll = () => document.querySelectorAll(".reveal").forEach((el) => el.classList.add("is-in"));
       showAll();
       const mo = new MutationObserver(showAll);
       mo.observe(document.body, { childList: true, subtree: true });
@@ -24,12 +21,11 @@ export function useReveal() {
             io.unobserve(e.target);
           }
         }),
-      { rootMargin: "0px 0px -10% 0px", threshold: 0.01 },
+      { rootMargin: "0px 0px -8% 0px", threshold: 0.08 },
     );
     const seen = new WeakSet<Element>();
     const scan = () =>
-      document.querySelectorAll(SELECTOR).forEach((el) => {
-        if (el.classList.contains("is-in")) return;
+      document.querySelectorAll(".reveal:not(.is-in)").forEach((el) => {
         if (seen.has(el)) return;
         seen.add(el);
         io.observe(el);
