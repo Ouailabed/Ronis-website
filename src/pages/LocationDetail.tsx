@@ -1,11 +1,11 @@
 import { Link, useParams } from "react-router-dom";
-import { ArrowLeft, ArrowUpRight, Bag, Bike, Phone, Pin } from "../components/Icons";
 import CopyShare from "../components/CopyShare";
+import { ArrowLeft, ArrowRight, ArrowUpRight, Bag, Bike, Phone } from "../components/Icons";
 import OpenStatus from "../components/OpenStatus";
-import RenderImage from "../components/RenderImage";
+import Photo from "../components/Photo";
+import ShopMap from "../components/ShopMap";
 import { LAST_CHECKED, locations, ordering } from "../data/business";
-import renders from "../data/renders";
-import { appleMapsUrl, directionsUrl, fullAddress, hoursRows, openStatus, telHref } from "../lib/hours";
+import { appleMapsUrl, directionsUrl, fullAddress, hoursRows, openStatus, telHref, todayHours } from "../lib/hours";
 import { useOrder } from "../lib/order";
 import { bakeryJsonLd, useSeo } from "../lib/seo";
 import { useLondonNow } from "../lib/useLondonNow";
@@ -25,111 +25,134 @@ export default function LocationDetail() {
   );
   if (!shop) return <NotFound />;
   const others = locations.filter((l) => l.slug !== shop.slug);
+  const today = todayHours(shop.hours, now);
 
   return (
     <>
-      <section className="page-hero container loc-hero">
+      <header className="container page-head loc-head">
         <Link to="/locations" className="back-link">
           <ArrowLeft /> All locations
         </Link>
-        <p className="eyebrow">{shop.opened ?? "Roni's bakery"}</p>
+        <p className="label">
+          <span>{String(locations.indexOf(shop) + 1).padStart(2, "0")}</span>
+          <span>{shop.opened ?? "Roni's bakery"}</span>
+        </p>
         <h1>
           Roni's <em>{shop.name}</em>
         </h1>
-        <OpenStatus status={openStatus(shop.hours, now)} fallback="Opening hours not published — please call" />
-      </section>
-
-      <section className="container loc-detail">
-        <div className="loc-panel">
-          <h2 className="loc-panel-title">Visit</h2>
-          <p className="loc-address">
-            <Pin />
-            <span>{fullAddress(shop)}</span>
-          </p>
-          <CopyShare address={fullAddress(shop)} title={`Roni's ${shop.name}`} />
-          <div className="loc-actions">
-            <a className="btn" href={directionsUrl(shop)} target="_blank" rel="noopener">
-              Google Maps directions <ArrowUpRight />
-            </a>
-            <a className="btn btn-ghost" href={appleMapsUrl(shop)} target="_blank" rel="noopener">
-              Apple Maps <ArrowUpRight />
-            </a>
-          </div>
-          <h2 className="loc-panel-title">Opening hours</h2>
-          {shop.hours.length ? (
-            <dl className="loc-hours loc-hours-big">
-              {hoursRows(shop.hours).map((r) => (
-                <div key={r.days}>
-                  <dt>{r.days}</dt>
-                  <dd>{r.time}</dd>
-                </div>
-              ))}
-            </dl>
-          ) : (
-            <p>{shop.needsCheck}</p>
-          )}
-          <p className="small">From Roni's website, checked {LAST_CHECKED}. Holiday hours may differ.</p>
-          <h2 className="loc-panel-title">Call</h2>
-          <a className="loc-phone" href={telHref(shop.phone)}>
-            <Phone />
-            {shop.phone}
+        <div className="loc-head-meta">
+          <OpenStatus status={openStatus(shop.hours, now)} fallback="Opening hours not published — please call" />
+          {today && <span className="small muted tnum">Today {today}</span>}
+        </div>
+        <div className="page-head-actions">
+          <button className="btn" onClick={() => openOrder(shop.slug)}>
+            Order from {shop.name} <ArrowRight />
+          </button>
+          <a className="btn btn-line" href={directionsUrl(shop)} target="_blank" rel="noopener">
+            Directions <ArrowUpRight />
           </a>
         </div>
+      </header>
 
-        <div className="loc-panel loc-order">
-          <h2 className="loc-panel-title">Order from {shop.name}</h2>
-          <ul className="order-options">
-            <li>
-              <a className="order-option" href={ordering.online} target="_blank" rel="noopener">
-                <Bag />
-                <span>
-                  <strong>Order online for collection</strong>
-                  <span className="small">Roni's official online ordering.</span>
-                </span>
-                <ArrowUpRight className="order-option-go" />
+      <section className="container loc-body">
+        <div className="loc-info">
+          <div className="loc-block">
+            <h2 className="label">Address</h2>
+            <p className="loc-big">{fullAddress(shop)}</p>
+            <CopyShare address={fullAddress(shop)} title={`Roni's ${shop.name}`} />
+            <p className="loc-maps">
+              <a className="link" href={directionsUrl(shop)} target="_blank" rel="noopener">
+                Google Maps <ArrowUpRight />
               </a>
-            </li>
-            {shop.deliveroo && (
+              <a className="link" href={appleMapsUrl(shop)} target="_blank" rel="noopener">
+                Apple Maps <ArrowUpRight />
+              </a>
+            </p>
+          </div>
+          <div className="loc-block">
+            <h2 className="label">Opening hours</h2>
+            {shop.hours.length ? (
+              <dl className="loc-hours">
+                {hoursRows(shop.hours).map((r) => (
+                  <div key={r.days}>
+                    <dt>{r.days}</dt>
+                    <dd className="tnum">{r.time}</dd>
+                  </div>
+                ))}
+              </dl>
+            ) : (
+              <p>{shop.needsCheck}</p>
+            )}
+            <p className="small muted">From Roni's website, checked {LAST_CHECKED}. Holiday hours may differ.</p>
+          </div>
+          <div className="loc-block">
+            <h2 className="label">Call</h2>
+            <a className="loc-big loc-phone tnum" href={telHref(shop.phone)}>
+              {shop.phone}
+            </a>
+          </div>
+          <div className="loc-block">
+            <h2 className="label">Order from {shop.name}</h2>
+            <ul className="order-options">
               <li>
-                <a className="order-option" href={shop.deliveroo} target="_blank" rel="noopener">
-                  <Bike />
+                <a className="order-option" href={ordering.online} target="_blank" rel="noopener">
+                  <Bag />
                   <span>
-                    <strong>Delivery with Deliveroo</strong>
-                    <span className="small">Roni's {shop.name} on Deliveroo.</span>
+                    <strong>Order online for collection</strong>
+                    <span className="small">Roni's official online ordering.</span>
                   </span>
                   <ArrowUpRight className="order-option-go" />
                 </a>
               </li>
-            )}
-            <li>
-              <a className="order-option" href={telHref(shop.phone)}>
-                <Phone />
-                <span>
-                  <strong>Call the shop</strong>
-                  <span className="small">For questions and last-minute orders.</span>
-                </span>
-                <ArrowUpRight className="order-option-go" />
-              </a>
-            </li>
-          </ul>
-          <button className="btn btn-ghost btn-small" onClick={() => openOrder(shop.slug)}>
-            Open the order helper
-          </button>
-          <div className="loc-art">
-            <RenderImage src={renders["bagels-trio"].src} width={renders["bagels-trio"].width} height={renders["bagels-trio"].height} alt="Illustration of three bagels: plain, sesame and poppy seed" />
+              {shop.deliveroo && (
+                <li>
+                  <a className="order-option" href={shop.deliveroo} target="_blank" rel="noopener">
+                    <Bike />
+                    <span>
+                      <strong>Delivery with Deliveroo</strong>
+                      <span className="small">Roni's {shop.name} on Deliveroo.</span>
+                    </span>
+                    <ArrowUpRight className="order-option-go" />
+                  </a>
+                </li>
+              )}
+              <li>
+                <a className="order-option" href={telHref(shop.phone)}>
+                  <Phone />
+                  <span>
+                    <strong>Call the shop</strong>
+                    <span className="small">For questions and last-minute orders.</span>
+                  </span>
+                  <ArrowRight className="order-option-go" />
+                </a>
+              </li>
+            </ul>
           </div>
         </div>
+        <aside className="loc-aside">
+          <ShopMap active={shop.slug} />
+          <Photo name="bagels" sizes="(min-width: 821px) 40vw, 100vw" className="loc-photo" />
+        </aside>
       </section>
 
-      <section className="container section loc-others">
-        <h2 className="loc-cards-title">Other Roni's nearby</h2>
+      <section className="container section loc-others" aria-labelledby="others-h">
+        <header className="sec-head">
+          <p className="label">
+            <span>—</span>
+            <span>Nearby</span>
+          </p>
+          <h2 id="others-h">
+            Other <em>Roni's.</em>
+          </h2>
+        </header>
         <ul className="loc-other-list">
           {others.map((l) => (
             <li key={l.slug}>
               <Link to={`/locations/${l.slug}`}>
-                <strong>{l.name}</strong>
-                <span>{fullAddress(l)}</span>
+                <span className="serif">{l.name}</span>
+                <span className="small muted">{fullAddress(l)}</span>
                 <OpenStatus status={openStatus(l.hours, now)} fallback="Call for hours" />
+                <ArrowRight className="loc-other-arrow" />
               </Link>
             </li>
           ))}

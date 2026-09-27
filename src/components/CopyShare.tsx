@@ -36,10 +36,10 @@ export default function CopyShare({ address, title }: { address: string; title: 
   };
   return (
     <div className="copy-share">
-      <button className="btn btn-ghost btn-small" onClick={() => copy(address, "Address copied")}>
+      <button className="btn btn-line btn-sm" onClick={() => copy(address, "Address copied")}>
         Copy address
       </button>
-      <button className="btn btn-ghost btn-small" onClick={share}>
+      <button className="btn btn-line btn-sm" onClick={share}>
         Share this shop
       </button>
       <span className="copy-note" role="status">

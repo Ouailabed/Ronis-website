@@ -43,6 +43,13 @@ Items and descriptions come from Roni's site and Roni's own Deliveroo listings. 
 - 2011: Roni and Alon opened Roni's Bagel Bakery and Café in Belsize Village. 2013: the Hampstead branch opened.
 - ❓ Opening years for Swains Lane, Muswell Hill and Brent Cross are not published, so they aren't dated.
 
+## Copy on the new home page
+
+- "Fresh bagels. Made properly." is a tagline from the design brief, not a factual claim — ❓ Roni's to approve.
+- "Roni's West Hampstead, the original, is open until midnight, every day" is worked out from the hours above and the 1989 West End Lane opening.
+- "Bagels to take home" groups the plain, sesame and poppy seed bagels listed on the bakery menu.
+- "The Roni's bagel" (smoked salmon & cream cheese) follows Roni's own description: "Roni's famous homemade bagel with premium smoked salmon and cream cheese".
+
 ## Deliberately not included
 
 - No customer reviews, ratings, awards or press quotes.

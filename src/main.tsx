@@ -3,6 +3,9 @@ import { createRoot } from "react-dom/client";
 import { BrowserRouter, HashRouter } from "react-router-dom";
 import App from "./App";
 
+// reveal-on-scroll styles only apply when scripts run (content is never hidden without JS)
+document.documentElement.classList.add("js");
+
 const root = createRoot(document.getElementById("root")!);
 
 if (import.meta.env.DEV && window.location.pathname === "/studio") {

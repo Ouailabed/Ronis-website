@@ -12,10 +12,13 @@ export default function Studio() {
   useEffect(() => {
     document.documentElement.style.background = "transparent";
     document.body.style.background = params.get("bg") ?? "transparent";
-    import("../three/studio").then(({ renderShot }) => {
+    const load = shot.startsWith("photo-")
+      ? import("../three/photo").then(({ renderPhoto }) => (c: HTMLCanvasElement) => renderPhoto(c, shot as never, w, h))
+      : import("../three/studio").then(({ renderShot }) => (c: HTMLCanvasElement) => renderShot(c, shot, w, h, progress, params.get("clear") ?? undefined));
+    load.then((render) => {
       if (!ref.current) return;
       const t0 = performance.now();
-      renderShot(ref.current, shot, w, h, progress, params.get("clear") ?? undefined);
+      render(ref.current);
       console.log(`rendered ${shot} in ${Math.round(performance.now() - t0)}ms`);
       setDone(true);
     });

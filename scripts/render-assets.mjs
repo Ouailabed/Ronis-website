@@ -1,28 +1,32 @@
 /**
- * Renders the 3D food models to optimised still images in public/renders.
- *   npm run render:assets            -> all shots
- *   npm run render:assets -- hero    -> just one (writes to public/renders)
+ * Renders the 3D food models (src/three/photo.ts) to optimised "photographs" in public/photos.
+ *   npm run render:assets                  -> all shots
+ *   npm run render:assets -- photo-hero    -> just one
  *   PREVIEW=1 ... -> also writes PNG previews to scripts/.preview (not committed)
  * Needs Chromium (set CHROMIUM_PATH if it isn't at /opt/pw-browsers/chromium).
  */
 import { spawn } from "node:child_process";
-import { mkdir, readdir, writeFile } from "node:fs/promises";
+import { mkdir, writeFile } from "node:fs/promises";
 import { chromium } from "playwright-core";
 import sharp from "sharp";
 
+// Each shot is rendered by src/three/photo.ts and saved at several widths for srcset.
+// Replace any of them with a real photo of the same name (see ASSETS.md and src/data/photos.ts).
+const PHOTO_WIDTHS = [640, 1200, 2000];
 const SHOTS = {
-  hero: { w: 1400, h: 1200, out: [{ file: "bagel-hero", width: 1100 }] },
-  opened: { w: 1400, h: 1200, out: [{ file: "bagel-opened", width: 1100 }] },
-  trio: { w: 1600, h: 1100, out: [{ file: "bagels-trio", width: 1200 }] },
-  challah: { w: 1600, h: 1000, out: [{ file: "challah", width: 1200 }] },
-  cake: { w: 1500, h: 1200, out: [{ file: "carrot-cake", width: 1100 }] },
-  platter: { w: 1600, h: 1200, out: [{ file: "platter", width: 1200 }] },
-  "top-plain": { w: 700, h: 700, out: [{ file: "top-plain", width: 360 }] },
-  "top-sesame": { w: 700, h: 700, out: [{ file: "top-sesame", width: 360 }] },
-  "top-poppy": { w: 700, h: 700, out: [{ file: "top-poppy", width: 360 }] },
+  "photo-hero": { w: 2400, h: 1440, file: "hero" },
+  "photo-hero-tall": { w: 1080, h: 1920, file: "hero-tall" },
+  "photo-signature": { w: 2400, h: 1440, file: "signature" },
+  "photo-salmon": { w: 1440, h: 1800, file: "bagel-salmon" },
+  "photo-saltbeef": { w: 1440, h: 1800, file: "bagel-saltbeef" },
+  "photo-cheddar": { w: 1440, h: 1800, file: "bagel-cheddar" },
+  "photo-tuna": { w: 1440, h: 1800, file: "bagel-tuna" },
+  "photo-bagels": { w: 2400, h: 1440, file: "bagels" },
+  "photo-crust": { w: 1440, h: 1800, file: "crust" },
+  "photo-challah": { w: 1440, h: 1800, file: "challah" },
+  "photo-cake": { w: 1440, h: 1800, file: "carrot-cake" },
+  "photo-platter": { w: 1440, h: 1800, file: "platter" },
 };
-// progress frames for the reduced-motion / no-WebGL story sequence
-for (const p of [0.3, 0.5, 0.7]) SHOTS[`progress-${p}`] = { w: 1400, h: 1200, p, shot: "progress", out: [{ file: `bagel-step-${Math.round(p * 100)}`, width: 900 }] };
 
 const only = process.argv.slice(2);
 const port = 5198;
@@ -36,7 +40,7 @@ for (let i = 0; i < 150; i += 1) {
 }
 
 const browser = await chromium.launch({ executablePath: process.env.CHROMIUM_PATH || "/opt/pw-browsers/chromium", args: ["--use-angle=swiftshader", "--enable-unsafe-swiftshader", "--ignore-gpu-blocklist"] });
-await mkdir("public/renders", { recursive: true });
+await mkdir("public/photos", { recursive: true });
 if (process.env.PREVIEW) await mkdir("scripts/.preview", { recursive: true });
 try {
   for (const [name, s] of Object.entries(SHOTS)) {
@@ -44,39 +48,34 @@ try {
     const page = await browser.newPage({ viewport: { width: s.w, height: s.h } });
     page.on("console", (m) => console.log(`  [${name}]`, m.text()));
     page.on("pageerror", (e) => console.error(`  [${name}] ERROR`, e.message));
-    const shot = s.shot ?? name;
-    await page.goto(`http://localhost:${port}/studio?shot=${shot}&w=${s.w}&h=${s.h}&p=${s.p ?? 0}`);
+    await page.goto(`http://localhost:${port}/studio?shot=${name}&w=${s.w}&h=${s.h}`);
     await page.waitForSelector("#studio[data-done=true]", { timeout: 180000 });
-    const png = await page.locator("#studio").screenshot({ omitBackground: true });
+    const png = await page.locator("#studio").screenshot();
     if (process.env.PREVIEW) await sharp(png).toFile(`scripts/.preview/${name}.png`);
-    for (const o of s.out) {
-      const trimmed = await sharp(png)
-        .trim({ threshold: 1 })
-        .extend({ top: 32, bottom: 32, left: 32, right: 32, background: { r: 0, g: 0, b: 0, alpha: 0 } })
-        .toBuffer();
-      await sharp(trimmed).resize({ width: o.width, withoutEnlargement: true }).webp({ quality: 82, alphaQuality: 90, effort: 6 }).toFile(`public/renders/${o.file}.webp`);
-      console.log(`✓ public/renders/${o.file}.webp`);
+    for (const width of PHOTO_WIDTHS) {
+      await sharp(png).resize({ width, withoutEnlargement: true }).webp({ quality: 80, effort: 6 }).toFile(`public/photos/${s.file}-${width}.webp`);
     }
+    console.log(`✓ public/photos/${s.file}-{${PHOTO_WIDTHS}}.webp`);
     await page.close();
   }
   // social share image (JPEG: the most widely supported preview format)
-  if (!only.length || only.includes("opened")) {
-    const dish = await sharp("public/renders/bagel-opened.webp").resize({ height: 560 }).toBuffer();
-    await sharp({ create: { width: 1200, height: 630, channels: 3, background: "#f6eedf" } })
-      .composite([{ input: dish, gravity: "center" }])
-      .jpeg({ quality: 84, mozjpeg: true })
-      .toFile("public/og.jpg");
+  if (!only.length || only.includes("photo-hero")) {
+    await sharp("public/photos/hero-2000.webp").resize({ width: 1200, height: 630, fit: "cover" }).jpeg({ quality: 84, mozjpeg: true }).toFile("public/og.jpg");
     console.log("✓ public/og.jpg");
   }
 
-  // size manifest used by the site for width/height attributes (no layout shift)
-  const manifest = {};
-  for (const f of (await readdir("public/renders")).filter((f) => f.endsWith(".webp")).sort()) {
-    const m = await sharp(`public/renders/${f}`).metadata();
-    manifest[f.replace(".webp", "")] = { src: `/renders/${f}`, width: m.width, height: m.height };
+  // manifest of every file and its size, for srcset and width/height (no layout shift)
+  const photos = {};
+  for (const p of Object.values(SHOTS)) {
+    const sizes = [];
+    for (const w of PHOTO_WIDTHS) {
+      const m = await sharp(`public/photos/${p.file}-${w}.webp`).metadata().catch(() => null);
+      if (m && !sizes.some((x) => x.w === m.width)) sizes.push({ src: `/photos/${p.file}-${w}.webp`, w: m.width, h: m.height });
+    }
+    if (sizes.length) photos[p.file] = sizes;
   }
-  await writeFile("src/data/renders.json", JSON.stringify(manifest, null, 2) + "\n");
-  console.log("✓ src/data/renders.json");
+  await writeFile("src/data/photos.json", JSON.stringify(photos, null, 2) + "\n");
+  console.log("✓ src/data/photos.json");
 } finally {
   await browser.close();
   process.kill(-server.pid); // stop the dev server and its children

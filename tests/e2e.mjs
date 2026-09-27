@@ -93,7 +93,7 @@ try {
   await page.goto(BASE + "/menu", { waitUntil: "networkidle" });
   await page.keyboard.press("Tab");
   ok((await page.evaluate(() => document.activeElement?.textContent)) === "Skip to content", "first Tab reaches the skip link");
-  const orderBtn = page.locator(".header-actions .btn");
+  const orderBtn = page.locator(".header-nav .btn");
   await orderBtn.focus();
   await page.keyboard.press("Enter");
   await page.waitForTimeout(300);
@@ -116,15 +116,15 @@ try {
 
   /* ------------------------------------------------ menu filtering */
   await page.goto(BASE + "/menu", { waitUntil: "networkidle" });
-  const all = await page.locator(".menu-items li").count();
+  const all = await page.locator(".menu-list li:not(.menu-list-note)").count();
   await page.getByRole("button", { name: "Platters", exact: true }).click();
   await page.waitForURL("**category=platters");
   await page.waitForTimeout(200);
-  const platters = await page.locator(".menu-items li").count();
+  const platters = await page.locator(".menu-list li:not(.menu-list-note)").count();
   ok(platters > 0 && platters < all && page.url().includes("category=platters"), `category filter works (${all} → ${platters}) and updates the URL`);
   await page.getByRole("button", { name: "Everything" }).click();
   await page.getByRole("searchbox").fill("salmon");
-  const salmon = await page.locator(".menu-items li").count();
+  const salmon = await page.locator(".menu-list li:not(.menu-list-note)").count();
   ok(salmon >= 1 && salmon < all, `search narrows the menu (“salmon” → ${salmon})`);
   await page.getByRole("searchbox").fill("zzzz");
   ok(await page.getByText("Show the whole menu").isVisible(), "no-results state offers a way back");
@@ -134,54 +134,83 @@ try {
   // keyboard on the slider: 30 guests + 14 steps of 5 = 100 guests → 200 minis → 8 platters of 25
   await page.locator("#guests").focus();
   for (let i = 0; i < 14; i += 1) await page.keyboard.press("ArrowRight");
-  ok(/^8 mini bagel platters/.test(await page.locator(".planner-result").innerText()), "platter planner (keyboard): 100 guests × 2 minis = 8 platters");
-  ok(/Place your order by/.test(await page.locator(".ep-result").innerText()), "event planner shows an order-by deadline");
+  ok(/^8 platters/.test(await page.locator(".planner-result").innerText()), "platter planner (keyboard): 100 guests × 2 minis = 8 platters");
+  ok(/Place your order by/i.test(await page.locator(".ep-result").innerText()), "event planner shows an order-by deadline");
   await page.locator("#ep-date").fill(new Date().toISOString().slice(0, 10));
   ok(/less than 48 hours/i.test(await page.locator(".ep-result").innerText()), "event planner warns when the event is under 48 hours away");
   await page.close();
 
-  /* ------------------------------------------------ home hero: buttons immediately, 3D loads */
+  /* ------------------------------------------------ home: hero, menu hover, signature scroll */
   const home = await browser.newPage({ viewport: { width: 1440, height: 900 } });
   await home.goto(BASE + "/", { waitUntil: "domcontentloaded" });
-  ok(await home.getByRole("button", { name: "Order now" }).nth(1).isVisible(), "hero “Order now” is visible straight away");
-  ok(await home.getByRole("link", { name: "Find your Roni's" }).first().isVisible(), "hero “Find your Roni's” is visible straight away");
-  await home.waitForSelector(".show.is-ready", { timeout: 30000 }).catch(() => null);
-  ok((await home.locator(".show.is-ready canvas").count()) === 1, "3D scene loads and takes over from the still image");
+  ok(await home.locator(".hero").getByRole("button", { name: "Order now" }).isVisible(), "hero “Order now” is visible straight away");
+  ok(await home.locator(".hero").getByRole("link", { name: "View menu" }).isVisible(), "hero “View menu” is visible straight away");
+  await home.waitForLoadState("networkidle");
+  ok(await home.locator(".hero-photo img").evaluate((i) => i.complete && i.naturalWidth > 0 && i.loading === "eager"), "hero photograph loads eagerly");
+  ok(/open now|closed right now/i.test(await home.locator(".hero-live").innerText()), "hero shows live opening status");
+  await home.locator("#menu").scrollIntoViewIfNeeded();
+  await home.locator(".menu-row").nth(2).hover();
+  await home.waitForTimeout(300);
+  ok((await home.locator(".menu-stage-photo").nth(2).getAttribute("class")).includes("is-active"), "hovering a menu item swaps the large photograph");
+  ok(/03 \/ 06/.test(await home.locator(".menu-stage-caption").innerText()), "menu photo caption follows the hovered item");
+  const clipAt = async () => home.locator(".sig-frame").evaluate((el) => getComputedStyle(el).clipPath);
+  await home.evaluate(() => window.scrollTo(0, document.querySelector(".sig-stage").getBoundingClientRect().top + window.scrollY - window.innerHeight * 0.8));
+  await home.waitForTimeout(900);
+  const clipStart = await clipAt();
+  await home.evaluate(() => window.scrollTo(0, document.querySelector(".sig-stage").getBoundingClientRect().top + window.scrollY - 40));
+  await home.waitForTimeout(1500);
+  const clipEnd = await clipAt();
+  ok(clipStart !== clipEnd && /^inset\(0(px|%)?( 0(px|%)?)*\)$/.test(clipEnd), `signature photo opens to full width on scroll (${clipStart} → ${clipEnd})`);
+  ok((await home.locator("canvas").count()) === 0, "no WebGL canvas on the page (photography only)");
   await home.close();
 
   /* ------------------------------------------------ reduced motion */
   const rm = await browser.newPage({ viewport: { width: 1280, height: 800 }, reducedMotion: "reduce" });
   await rm.goto(BASE + "/", { waitUntil: "networkidle" });
-  ok((await rm.locator(".show.is-static").count()) === 1 && (await rm.locator(".show canvas").count()) === 0, "reduced motion: no 3D scroll scene, static sequence instead");
-  ok((await rm.locator(".show-sequence img").count()) === 3, "reduced motion: the bagel story is shown as three stills");
+  ok((await rm.locator(".sig-frame").evaluate((el) => getComputedStyle(el).clipPath)) === "none", "reduced motion: signature photo is simply full width");
+  ok((await rm.locator(".timeline li").first().evaluate((el) => getComputedStyle(el).opacity)) === "1", "reduced motion: content is visible without scroll animations");
+  ok((await rm.locator(".hero-photo").evaluate((el) => getComputedStyle(el).animationName)) === "none", "reduced motion: no hero intro animation");
   await rm.close();
 
   /* ------------------------------------------------ mobile */
   const m = await browser.newPage({ viewport: { width: 390, height: 844 }, isMobile: true, hasTouch: true });
   await m.goto(BASE + "/", { waitUntil: "networkidle" });
-  ok(await m.locator(".mobile-bar").isVisible(), "mobile: sticky Order / Find bar is visible");
-  await m.locator(".menu-toggle").click();
-  ok(await m.locator("#mobile-menu").isVisible(), "mobile: menu button opens navigation");
-  await m.locator("#mobile-menu a", { hasText: "Locations" }).click();
-  await m.waitForURL("**/locations");
-  await m.waitForTimeout(1000);
-  ok(!(await m.locator("#mobile-menu").isVisible()), "mobile: navigating closes the menu");
-  const overflow = await m.evaluate(() => document.documentElement.scrollWidth - window.innerWidth);
-  ok(overflow <= 0, `mobile: no horizontal overflow (${overflow}px)`);
+  ok(await m.locator(".header-nav").getByRole("link", { name: "Menu" }).isVisible(), "mobile: header shows Menu");
+  ok(await m.locator(".header-nav").getByRole("button", { name: "Order" }).isVisible(), "mobile: header shows Order");
+  ok(!(await m.locator(".header-nav .nav-wide").first().isVisible()), "mobile: no crowded navigation");
+  const heroSrc = await m.locator(".hero-photo img").evaluate((i) => i.currentSrc);
+  ok(/hero-tall/.test(heroSrc), "mobile: hero uses the tall crop");
+  await m.locator(".menu-row").first().scrollIntoViewIfNeeded();
+  ok(await m.locator(".menu-row-photo").first().isVisible(), "mobile: each menu item shows its own photo");
+  ok(!(await m.locator(".menu-stage").isVisible()), "mobile: desktop hover stage is hidden");
+  const btnHeights = await m.locator(".btn").evaluateAll((bs) => bs.filter((b) => b.offsetParent).map((b) => b.getBoundingClientRect().height));
+  ok(btnHeights.every((hh) => hh >= 38), `mobile: buttons are comfortably tappable (min ${Math.min(...btnHeights).toFixed(0)}px)`);
   await m.close();
+
+  /* ------------------------------------------------ no horizontal overflow at any size */
+  for (const w of [375, 390, 430, 768, 1024, 1440, 1920]) {
+    const pg = await browser.newPage({ viewport: { width: w, height: 900 }, reducedMotion: "reduce" });
+    const wide = [];
+    for (const route of ["/", "/menu", "/locations", "/locations/west-hampstead", "/catering", "/cakes", "/about", "/contact"]) {
+      await pg.goto(BASE + route, { waitUntil: "networkidle" });
+      const over = await pg.evaluate(() => document.documentElement.scrollWidth - window.innerWidth);
+      if (over > 0) wide.push(`${route} +${over}px`);
+    }
+    ok(wide.length === 0, `${w}px: no horizontal overflow${wide.length ? ` (${wide.join(", ")})` : ""}`);
+    await pg.close();
+  }
 } finally {
   await browser.close();
 }
 
-/* ------------------------------------------------ no WebGL: still images */
+/* ------------------------------------------------ no WebGL at all: nothing changes */
 const noGl = await chromium.launch({ executablePath: EXE, args: ["--disable-webgl", "--disable-3d-apis"] });
 try {
   const p = await noGl.newPage({ viewport: { width: 1280, height: 800 } });
   const errors = [];
   p.on("pageerror", (e) => errors.push(e.message));
   await p.goto(BASE + "/", { waitUntil: "networkidle" });
-  ok((await p.locator(".show.is-static").count()) === 1, "no WebGL: falls back to the static scene");
-  ok(await p.locator(".show-still").isVisible(), "no WebGL: hero still image is shown");
+  ok(await p.locator(".hero-photo img").isVisible(), "no WebGL: hero photograph is shown");
   ok(errors.length === 0, "no WebGL: no page errors");
 } finally {
   await noGl.close();

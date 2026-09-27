@@ -1,0 +1,201 @@
+{
+  "hero": [
+    {
+      "src": "/photos/hero-640.webp",
+      "w": 640,
+      "h": 384
+    },
+    {
+      "src": "/photos/hero-1200.webp",
+      "w": 1200,
+      "h": 720
+    },
+    {
+      "src": "/photos/hero-2000.webp",
+      "w": 2000,
+      "h": 1200
+    }
+  ],
+  "hero-tall": [
+    {
+      "src": "/photos/hero-tall-640.webp",
+      "w": 640,
+      "h": 1138
+    },
+    {
+      "src": "/photos/hero-tall-1200.webp",
+      "w": 1080,
+      "h": 1920
+    }
+  ],
+  "signature": [
+    {
+      "src": "/photos/signature-640.webp",
+      "w": 640,
+      "h": 384
+    },
+    {
+      "src": "/photos/signature-1200.webp",
+      "w": 1200,
+      "h": 720
+    },
+    {
+      "src": "/photos/signature-2000.webp",
+      "w": 2000,
+      "h": 1200
+    }
+  ],
+  "bagel-salmon": [
+    {
+      "src": "/photos/bagel-salmon-640.webp",
+      "w": 640,
+      "h": 800
+    },
+    {
+      "src": "/photos/bagel-salmon-1200.webp",
+      "w": 1200,
+      "h": 1500
+    },
+    {
+      "src": "/photos/bagel-salmon-2000.webp",
+      "w": 1440,
+      "h": 1800
+    }
+  ],
+  "bagel-saltbeef": [
+    {
+      "src": "/photos/bagel-saltbeef-640.webp",
+      "w": 640,
+      "h": 800
+    },
+    {
+      "src": "/photos/bagel-saltbeef-1200.webp",
+      "w": 1200,
+      "h": 1500
+    },
+    {
+      "src": "/photos/bagel-saltbeef-2000.webp",
+      "w": 1440,
+      "h": 1800
+    }
+  ],
+  "bagel-cheddar": [
+    {
+      "src": "/photos/bagel-cheddar-640.webp",
+      "w": 640,
+      "h": 800
+    },
+    {
+      "src": "/photos/bagel-cheddar-1200.webp",
+      "w": 1200,
+      "h": 1500
+    },
+    {
+      "src": "/photos/bagel-cheddar-2000.webp",
+      "w": 1440,
+      "h": 1800
+    }
+  ],
+  "bagel-tuna": [
+    {
+      "src": "/photos/bagel-tuna-640.webp",
+      "w": 640,
+      "h": 800
+    },
+    {
+      "src": "/photos/bagel-tuna-1200.webp",
+      "w": 1200,
+      "h": 1500
+    },
+    {
+      "src": "/photos/bagel-tuna-2000.webp",
+      "w": 1440,
+      "h": 1800
+    }
+  ],
+  "bagels": [
+    {
+      "src": "/photos/bagels-640.webp",
+      "w": 640,
+      "h": 384
+    },
+    {
+      "src": "/photos/bagels-1200.webp",
+      "w": 1200,
+      "h": 720
+    },
+    {
+      "src": "/photos/bagels-2000.webp",
+      "w": 2000,
+      "h": 1200
+    }
+  ],
+  "crust": [
+    {
+      "src": "/photos/crust-640.webp",
+      "w": 640,
+      "h": 800
+    },
+    {
+      "src": "/photos/crust-1200.webp",
+      "w": 1200,
+      "h": 1500
+    },
+    {
+      "src": "/photos/crust-2000.webp",
+      "w": 1440,
+      "h": 1800
+    }
+  ],
+  "challah": [
+    {
+      "src": "/photos/challah-640.webp",
+      "w": 640,
+      "h": 800
+    },
+    {
+      "src": "/photos/challah-1200.webp",
+      "w": 1200,
+      "h": 1500
+    },
+    {
+      "src": "/photos/challah-2000.webp",
+      "w": 1440,
+      "h": 1800
+    }
+  ],
+  "carrot-cake": [
+    {
+      "src": "/photos/carrot-cake-640.webp",
+      "w": 640,
+      "h": 800
+    },
+    {
+      "src": "/photos/carrot-cake-1200.webp",
+      "w": 1200,
+      "h": 1500
+    },
+    {
+      "src": "/photos/carrot-cake-2000.webp",
+      "w": 1440,
+      "h": 1800
+    }
+  ],
+  "platter": [
+    {
+      "src": "/photos/platter-640.webp",
+      "w": 640,
+      "h": 800
+    },
+    {
+      "src": "/photos/platter-1200.webp",
+      "w": 1200,
+      "h": 1500
+    },
+    {
+      "src": "/photos/platter-2000.webp",
+      "w": 1440,
+      "h": 1800
+    }
+  ]
+}

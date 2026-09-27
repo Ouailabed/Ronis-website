@@ -61,7 +61,7 @@ export default function OrderDialog() {
       <div className="order-sheet">
         <header className="order-head">
           <div>
-            <p className="eyebrow">Order now</p>
+            <p className="label">Order now</p>
             <h2 id="order-title">{shop ? `Roni's ${shop.name}` : "Which Roni's?"}</h2>
           </div>
           <button className="icon-btn" onClick={closeOrder} aria-label="Close">
@@ -86,7 +86,7 @@ export default function OrderDialog() {
             </ul>
             <p className="order-foot small">
               Know what you want?{" "}
-              <a href={ordering.online} target="_blank" rel="noopener" className="link-arrow">
+              <a href={ordering.online} target="_blank" rel="noopener" className="link">
                 Go straight to Roni's online ordering <ArrowUpRight className="icon-inline" />
               </a>
             </p>
@@ -141,7 +141,7 @@ export default function OrderDialog() {
                 </Link>
               </li>
             </ul>
-            <button className="btn btn-ghost btn-small order-back" onClick={() => setSlug(null)}>
+            <button className="btn btn-line btn-sm order-back" onClick={() => setSlug(null)}>
               Choose a different shop
             </button>
           </>

@@ -1,40 +1,54 @@
 import { useEffect, useState } from "react";
 import { Link, NavLink, useLocation } from "react-router-dom";
-import { lockScroll } from "../lib/motion";
 import { useOrder } from "../lib/order";
-import { Bag, Close, Menu, Pin } from "./Icons";
-import Logo from "./Logo";
-import OpenNowPill from "./OpenNowPill";
 
 export const NAV = [
   { to: "/menu", label: "Menu" },
-  { to: "/locations", label: "Locations" },
-  { to: "/catering", label: "Catering" },
-  { to: "/cakes", label: "Cakes" },
-  { to: "/about", label: "About" },
-  { to: "/contact", label: "Contact" },
+  { to: "/about", label: "About", wide: true },
+  { to: "/locations", label: "Locations", wide: true },
 ];
+
+export function Wordmark({ sub = true }: { sub?: boolean }) {
+  return (
+    <span className="wordmark">
+      <span className="wordmark-name">Roni's</span>
+      {sub && <span className="wordmark-sub">Bagel Bakery</span>}
+    </span>
+  );
+}
 
 export default function Header() {
   const { openOrder } = useOrder();
-  const [open, setOpen] = useState(false);
-  const [scrolled, setScrolled] = useState(false);
   const { pathname } = useLocation();
+  // on the home page the header sits on the photograph until the hero has scrolled away
+  const [over, setOver] = useState(pathname === "/");
+  const [scrolled, setScrolled] = useState(false);
 
-  useEffect(() => setOpen(false), [pathname]);
   useEffect(() => {
-    const onScroll = () => setScrolled(window.scrollY > 8);
-    onScroll();
+    if (pathname !== "/") {
+      setOver(false);
+      return;
+    }
+    let frame = 0;
+    const update = () => {
+      frame = 0;
+      const hero = document.querySelector<HTMLElement>("[data-hero]");
+      const h = parseFloat(getComputedStyle(document.documentElement).getPropertyValue("--header-h")) || 64;
+      setOver(!!hero && hero.getBoundingClientRect().bottom > h);
+      setScrolled(window.scrollY > 24);
+    };
+    const onScroll = () => {
+      if (!frame) frame = requestAnimationFrame(update);
+    };
+    update();
     window.addEventListener("scroll", onScroll, { passive: true });
-    return () => window.removeEventListener("scroll", onScroll);
-  }, []);
-  useEffect(() => {
-    document.body.style.overflow = open ? "hidden" : "";
-    lockScroll(open);
-    const onKey = (e: KeyboardEvent) => e.key === "Escape" && setOpen(false);
-    window.addEventListener("keydown", onKey);
-    return () => window.removeEventListener("keydown", onKey);
-  }, [open]);
+    window.addEventListener("resize", onScroll);
+    return () => {
+      cancelAnimationFrame(frame);
+      window.removeEventListener("scroll", onScroll);
+      window.removeEventListener("resize", onScroll);
+    };
+  }, [pathname]);
 
   return (
     <>
@@ -48,54 +62,23 @@ export default function Header() {
       >
         Skip to content
       </a>
-      <header className={`site-header${scrolled ? " is-scrolled" : ""}${open ? " is-open" : ""}`}>
-        <div className="header-inner">
-          <Link to="/" className="header-logo" aria-label="Roni's Bagel Bakery — home">
-            <Logo />
+      <header className={`site-header${over ? " is-over" : ""}${over && scrolled ? " is-scrolled" : ""}`}>
+        <div className="container header-inner">
+          <Link to="/" aria-label="Roni's Bagel Bakery — home">
+            <Wordmark />
           </Link>
           <nav className="header-nav" aria-label="Main">
             {NAV.map((n) => (
-              <NavLink key={n.to} to={n.to} className={({ isActive }) => (isActive ? "is-active" : undefined)}>
+              <NavLink key={n.to} to={n.to} className={({ isActive }) => `${n.wide ? "nav-wide" : ""}${isActive ? " is-active" : ""}`.trim() || undefined}>
                 {n.label}
               </NavLink>
             ))}
-          </nav>
-          <div className="header-actions">
-            <OpenNowPill />
-            <button className="btn btn-small" onClick={() => openOrder()}>
-              <Bag />
-              Order now
+            <button className="btn" onClick={() => openOrder()}>
+              Order
             </button>
-            <button className="icon-btn menu-toggle" aria-expanded={open} aria-controls="mobile-menu" onClick={() => setOpen(!open)} aria-label={open ? "Close menu" : "Open menu"}>
-              {open ? <Close /> : <Menu />}
-            </button>
-          </div>
-        </div>
-        <div id="mobile-menu" className="mobile-menu" hidden={!open}>
-          <nav aria-label="Mobile">
-            <NavLink to="/" end>
-              Home
-            </NavLink>
-            {NAV.map((n) => (
-              <NavLink key={n.to} to={n.to}>
-                {n.label}
-              </NavLink>
-            ))}
           </nav>
         </div>
       </header>
-
-      {/* always-reachable actions on phones */}
-      <div className="mobile-bar" role="region" aria-label="Quick actions">
-        <Link to="/locations" className="btn btn-ghost btn-small">
-          <Pin />
-          Find a Roni's
-        </Link>
-        <button className="btn btn-small" onClick={() => openOrder()}>
-          <Bag />
-          Order now
-        </button>
-      </div>
     </>
   );
 }
