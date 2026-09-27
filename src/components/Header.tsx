@@ -4,6 +4,7 @@ import { lockScroll } from "../lib/motion";
 import { useOrder } from "../lib/order";
 import { Bag, Close, Menu, Pin } from "./Icons";
 import Logo from "./Logo";
+import OpenNowPill from "./OpenNowPill";
 
 export const NAV = [
   { to: "/menu", label: "Menu" },
@@ -60,6 +61,7 @@ export default function Header() {
             ))}
           </nav>
           <div className="header-actions">
+            <OpenNowPill />
             <button className="btn btn-small" onClick={() => openOrder()}>
               <Bag />
               Order now

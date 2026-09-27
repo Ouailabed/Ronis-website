@@ -1,36 +1,66 @@
-/** Illustrated bakery shopfront (decorative). Not a depiction of a specific Roni's shop. */
+/**
+ * Illustrated Roni's shopfront in the shop's real colours: sage paintwork, painted
+ * fascia lettering, bottle-green awning with blue-and-white stripes, and bagels in the window.
+ * Decorative; replace with a photo of the shop when available (see ASSETS.md).
+ */
 export default function Shopfront() {
-  const stripes = Array.from({ length: 12 }, (_, i) => i);
+  const stripes = Array.from({ length: 16 }, (_, i) => i);
+  const bagels: [number, number][] = [
+    [96, 300], [140, 300], [184, 300], [228, 300], [118, 276], [162, 276], [206, 276], [140, 252], [184, 252],
+  ];
   return (
     <figure className="shopfront">
-      <svg viewBox="0 0 480 420" role="img" aria-label="Illustration of a bakery shopfront with a striped awning and bagels in the window">
-        <rect x="20" y="40" width="440" height="370" rx="6" fill="#fbf7ee" stroke="#1d3a5f" strokeWidth="4" />
-        <rect x="20" y="40" width="440" height="70" fill="#1d3a5f" />
-        <text x="240" y="88" textAnchor="middle" fontFamily="Fraunces Variable, Georgia, serif" fontSize="40" fontWeight="700" fill="#fbf7ee">
-          Roni's
-        </text>
-        <g className="awning">
-          {stripes.map((i) => (
-            <path key={i} d={`M${20 + i * 36.67} 110 h36.67 v44 q-18.33 16 -36.67 0 Z`} fill={i % 2 ? "#fbf7ee" : "#c8873a"} stroke="#1d3a5f" strokeWidth="2" />
+      <svg viewBox="0 0 480 440" role="img" aria-label="Illustration of the Roni's shopfront: sage paintwork, a striped blue-and-white awning and bagels in the window">
+        {/* brick wall behind */}
+        <rect x="0" y="0" width="480" height="440" fill="#b9745a" />
+        <g stroke="#a3614a" strokeWidth="2">
+          {Array.from({ length: 22 }, (_, r) => (
+            <path key={r} d={`M0 ${r * 20} H480`} />
           ))}
         </g>
-        <rect x="46" y="186" width="250" height="176" rx="4" fill="#d9e2ee" stroke="#1d3a5f" strokeWidth="4" />
-        <path d="M46 300 h250" stroke="#1d3a5f" strokeWidth="3" />
-        {/* bagels stacked in the window */}
-        {[[90, 286], [140, 286], [190, 286], [240, 286], [115, 258], [165, 258], [215, 258], [140, 232], [190, 232]].map(([x, y], i) => (
+        {/* shopfront body */}
+        <rect x="24" y="36" width="432" height="404" fill="#8ba593" />
+        {/* fascia with painted lettering */}
+        <rect x="24" y="36" width="432" height="64" fill="#7c9784" />
+        <rect x="34" y="44" width="412" height="48" rx="3" fill="none" stroke="#f4eee2" strokeOpacity="0.6" strokeWidth="1.5" />
+        <text x="240" y="77" textAnchor="middle" fontFamily="Gloock, Georgia, serif" fontSize="20" letterSpacing="1.5" fill="#fbf8f1">
+          RONI'S BAGEL BAKERY &amp; CAFE
+        </text>
+        {/* awning: blue & white stripes with a bottle-green valance */}
+        <g className="awning-svg">
+          {stripes.map((i) => (
+            <rect key={i} x={24 + i * 27} y="100" width="27" height="40" fill={i % 2 ? "#fbf8f1" : "#2b4c93"} />
+          ))}
+          <path d={`M24 140 ${stripes.map(() => `q13.5 14 27 0`).join(" ")} V140 Z`} fill="#1d3a2f" />
+          <rect x="24" y="138" width="432" height="6" fill="#1d3a2f" />
+        </g>
+        {/* shop window */}
+        <rect x="52" y="176" width="232" height="190" fill="#d7e1d8" stroke="#56725f" strokeWidth="6" />
+        <path d="M168 176 V366" stroke="#56725f" strokeWidth="4" />
+        <rect x="60" y="322" width="216" height="10" fill="#e6d9bf" />
+        {bagels.map(([x, y], i) => (
           <g key={i}>
-            <ellipse cx={x} cy={y} rx="24" ry="12" fill={i % 3 === 2 ? "#b77a3c" : "#9a5a24"} stroke="#5e3514" strokeWidth="2" />
-            <ellipse cx={x} cy={y - 1} rx="7" ry="3.5" fill="#d9e2ee" stroke="#5e3514" strokeWidth="1.5" />
+            <ellipse cx={x} cy={y + 20} rx="20" ry="10" fill={i % 3 === 2 ? "#c08548" : "#9a5a24"} />
+            <ellipse cx={x} cy={y + 19} rx="6" ry="3" fill="#d7e1d8" />
           </g>
         ))}
-        <rect x="320" y="186" width="114" height="224" rx="4" fill="#1d3a5f" />
-        <rect x="334" y="202" width="86" height="92" rx="3" fill="#d9e2ee" />
-        <circle cx="410" cy="330" r="5" fill="#c8873a" />
-        <rect x="60" y="316" width="220" height="30" rx="4" fill="#fbf7ee" />
-        <text x="170" y="337" textAnchor="middle" fontFamily="Instrument Sans Variable, sans-serif" fontSize="14" fontWeight="700" fill="#1d3a5f" letterSpacing="3">
-          BAGEL BAKERY
-        </text>
-        <path d="M0 410 h480" stroke="#1d3a5f" strokeWidth="4" />
+        {/* door */}
+        <rect x="316" y="176" width="112" height="264" fill="#56725f" />
+        <rect x="330" y="192" width="84" height="120" fill="#d7e1d8" stroke="#1d3a2f" strokeWidth="3" />
+        <rect x="330" y="326" width="84" height="96" fill="none" stroke="#1d3a2f" strokeWidth="3" />
+        <circle cx="404" cy="316" r="5" fill="#b88f4a" />
+        {/* stall base */}
+        <rect x="24" y="366" width="292" height="74" fill="#7c9784" />
+        <rect x="40" y="382" width="260" height="42" fill="none" stroke="#56725f" strokeWidth="3" />
+        {/* flower buckets outside */}
+        {[340, 372, 404, 436].map((x, i) => (
+          <g key={x}>
+            <rect x={x - 12} y="408" width="24" height="32" fill="#2b4c93" />
+            {[-8, 0, 8].map((dx, j) => (
+              <circle key={j} cx={x + dx} cy={402 - (j % 2) * 6} r="7" fill={["#e8849b", "#f2c14e", "#f07b52", "#e8849b"][(i + j) % 4]} />
+            ))}
+          </g>
+        ))}
       </svg>
       <figcaption className="render-note">Illustration</figcaption>
     </figure>

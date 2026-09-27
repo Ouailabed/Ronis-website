@@ -1,5 +1,6 @@
 import { Link, useParams } from "react-router-dom";
 import { ArrowLeft, ArrowUpRight, Bag, Bike, Phone, Pin } from "../components/Icons";
+import CopyShare from "../components/CopyShare";
 import OpenStatus from "../components/OpenStatus";
 import RenderImage from "../components/RenderImage";
 import { LAST_CHECKED, locations, ordering } from "../data/business";
@@ -45,6 +46,7 @@ export default function LocationDetail() {
             <Pin />
             <span>{fullAddress(shop)}</span>
           </p>
+          <CopyShare address={fullAddress(shop)} title={`Roni's ${shop.name}`} />
           <div className="loc-actions">
             <a className="btn" href={directionsUrl(shop)} target="_blank" rel="noopener">
               Google Maps directions <ArrowUpRight />

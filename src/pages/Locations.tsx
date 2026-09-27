@@ -65,9 +65,8 @@ export default function Locations() {
                 <a className="btn btn-ghost btn-small" href={directionsUrl(l)} target="_blank" rel="noopener">
                   Directions <ArrowUpRight />
                 </a>
-                <a className="btn btn-ghost btn-small" href={telHref(l.phone)} aria-label={`Call Roni's ${l.name} on ${l.phone}`}>
+                <a className="btn btn-ghost btn-small btn-icon" href={telHref(l.phone)} aria-label={`Call Roni's ${l.name} on ${l.phone}`}>
                   <Phone />
-                  Call
                 </a>
               </div>
               <Link to={`/locations/${l.slug}`} className="link-arrow">

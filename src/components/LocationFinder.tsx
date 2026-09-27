@@ -1,8 +1,9 @@
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { Link } from "react-router-dom";
 import { locations, type Location } from "../data/business";
 import { directionsUrl, fullAddress, hoursRows, openStatus, telHref } from "../lib/hours";
 import { useOrder } from "../lib/order";
+import { formatKm, useNearest } from "../lib/nearest";
 import { useLondonNow } from "../lib/useLondonNow";
 import { ArrowRight, ArrowUpRight, Bag, Clock, Phone, Pin } from "./Icons";
 import OpenStatus from "./OpenStatus";
@@ -76,21 +77,43 @@ export default function LocationFinder({ headingLevel = 3 }: { headingLevel?: 2 
   const now = useLondonNow();
   const [selected, setSelected] = useState(locations[0].slug);
   const shop = locations.find((l) => l.slug === selected)!;
+  const near = useNearest();
+  const kmFor = (slug: string) => near.ranked.find((r) => r.slug === slug)?.km;
+  // once located: nearest first, and select the nearest one
+  const ordered = near.status === "done" ? near.ranked.map((r) => locations.find((l) => l.slug === r.slug)!) : locations;
+  useEffect(() => {
+    if (near.status === "done" && near.ranked[0]) setSelected(near.ranked[0].slug);
+  }, [near.status, near.ranked]);
 
   return (
+    <div className="finder-wrap">
+      <div className="finder-near">
+        <button className="btn btn-small btn-gold" onClick={near.locate} disabled={near.status === "locating"}>
+          <Pin />
+          {near.status === "locating" ? "Finding you…" : near.status === "done" ? "Nearest first ✓" : "Find my nearest Roni's"}
+        </button>
+        <p className="small" aria-live="polite">
+          {near.status === "error"
+            ? near.message
+            : near.status === "done"
+              ? `Closest: Roni's ${locations.find((l) => l.slug === near.ranked[0].slug)?.name}, about ${formatKm(near.ranked[0].km)} away (straight line).`
+              : "Uses your location once, only on this device. Nothing is stored."}
+        </p>
+      </div>
     <div className="finder">
       <div className="finder-list" role="group" aria-label="Choose a Roni's bakery">
-        {locations.map((l, i) => (
+        {ordered.map((l) => (
           <button
             key={l.slug}
             aria-pressed={l.slug === selected}
             className={`finder-item${l.slug === selected ? " is-selected" : ""}`}
             onClick={() => setSelected(l.slug)}
           >
-            <span className="finder-num">{String(i + 1).padStart(2, "0")}</span>
+            <span className="finder-num">{String(locations.indexOf(l) + 1).padStart(2, "0")}</span>
             <span className="finder-name">{l.name}</span>
             <span className="finder-meta">
               <OpenStatus status={openStatus(l.hours, now)} fallback="Call for hours" />
+              {kmFor(l.slug) !== undefined && <span className="finder-km">{formatKm(kmFor(l.slug)!)}</span>}
             </span>
           </button>
         ))}
@@ -106,7 +129,7 @@ export default function LocationFinder({ headingLevel = 3 }: { headingLevel?: 2 
           <rect width="400" height="300" fill="url(#streets)" />
           {/* Hampstead Heath, roughly placed as a landmark */}
           <path d="M218 150c20-16 64-18 90-4 16 10 12 36-4 50-20 18-60 20-80 6-16-12-20-38-6-52Z" fill="rgba(95,127,51,.16)" />
-          <text x="222" y="186" className="map-area">Hampstead Heath</text>
+          <text x="236" y="170" className="map-area">Heath</text>
           {locations.map((l, i) => {
             const p = project(l);
             const active = l.slug === selected;
@@ -129,6 +152,7 @@ export default function LocationFinder({ headingLevel = 3 }: { headingLevel?: 2 
       <div className="finder-detail" aria-live="polite">
         <ShopDetails shop={shop} headingLevel={headingLevel} />
       </div>
+    </div>
     </div>
   );
 }

@@ -429,9 +429,9 @@
    ========================================================================= */
 .catering-steps-wrap {
   display: grid;
-  grid-template-columns: 2fr 1fr;
+  grid-template-columns: 1.6fr 1fr;
   gap: 20px;
-  align-items: stretch;
+  align-items: start;
 }
 .catering-steps {
   display: grid;
@@ -449,7 +449,8 @@
 }
 .catering-steps h2 {
   margin: 14px 0 8px;
-  font-size: 24px;
+  font-size: 22px;
+  line-height: 1.15;
 }
 .catering-steps p {
   margin: 0;
@@ -940,4 +941,119 @@
 }
 .not-found {
   min-height: 60vh;
+}
+
+.btn-icon {
+  width: 44px;
+  padding: 0;
+}
+.loc-card-actions {
+  flex-wrap: nowrap;
+}
+
+/* catering event planner */
+.event-planner {
+  display: grid;
+  gap: 16px;
+  padding: clamp(20px, 2.4vw, 28px);
+  border-radius: var(--radius);
+  background: var(--bottle);
+  color: var(--paper);
+}
+.ep-head {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+.ep-head svg {
+  width: 26px;
+  height: 26px;
+  color: var(--brass-soft);
+}
+.ep-head h3 {
+  color: var(--paper);
+  font-size: 26px;
+}
+.ep-fields {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 10px;
+}
+.ep-fields label {
+  display: grid;
+  gap: 6px;
+  font-size: 13px;
+  font-weight: 600;
+  letter-spacing: 0.04em;
+  color: var(--brass-soft);
+}
+.ep-fields input {
+  min-height: 46px;
+  padding: 0 12px;
+  border: 0;
+  border-radius: 12px;
+  background: var(--paper);
+  color: var(--ink);
+  font: inherit;
+  font-size: 16px;
+  color-scheme: light;
+}
+.ep-result {
+  padding: 16px;
+  border-radius: 14px;
+  background: rgba(251, 248, 241, 0.08);
+  box-shadow: inset 0 0 0 1px rgba(251, 248, 241, 0.18);
+}
+.ep-result p {
+  margin: 0;
+}
+.ep-label {
+  font-size: 13px;
+  color: var(--brass-soft);
+}
+.ep-date {
+  margin: 4px 0 12px !important;
+  font-family: var(--display);
+  font-size: clamp(24px, 2.4vw, 30px);
+  line-height: 1.1;
+}
+.ep-result .small {
+  color: rgba(251, 248, 241, 0.8);
+}
+.ep-actions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+}
+.ep-actions .btn {
+  --btn-bg: var(--paper);
+  --btn-fg: var(--bottle-deep);
+}
+.ep-actions .btn-ghost {
+  --btn-bg: transparent;
+  --btn-fg: var(--paper);
+  --btn-hover: var(--paper);
+  --btn-hover-fg: var(--bottle-deep);
+}
+.ep-note {
+  margin: 0;
+  color: rgba(251, 248, 241, 0.75) !important;
+}
+@media (max-width: 420px) {
+  .ep-fields {
+    grid-template-columns: 1fr;
+  }
+}
+
+.copy-share {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 8px;
+  margin: -4px 0 16px;
+}
+.copy-note {
+  font-size: 13px;
+  font-weight: 600;
+  color: var(--sage-deep);
 }

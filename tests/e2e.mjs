@@ -135,7 +135,9 @@ try {
   await page.locator("#guests").focus();
   for (let i = 0; i < 14; i += 1) await page.keyboard.press("ArrowRight");
   ok(/^8 mini bagel platters/.test(await page.locator(".planner-result").innerText()), "platter planner (keyboard): 100 guests × 2 minis = 8 platters");
-  ok((await page.locator(".lead-card-date").innerText()).length > 5, "earliest collection date is shown");
+  ok(/Place your order by/.test(await page.locator(".ep-result").innerText()), "event planner shows an order-by deadline");
+  await page.locator("#ep-date").fill(new Date().toISOString().slice(0, 10));
+  ok(/less than 48 hours/i.test(await page.locator(".ep-result").innerText()), "event planner warns when the event is under 48 hours away");
   await page.close();
 
   /* ------------------------------------------------ home hero: buttons immediately, 3D loads */

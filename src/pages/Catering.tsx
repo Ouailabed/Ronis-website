@@ -1,31 +1,13 @@
 import { useState } from "react";
 import { Link } from "react-router-dom";
-import { ArrowUpRight, Calendar, Phone } from "../components/Icons";
+import { ArrowUpRight, Phone } from "../components/Icons";
+import EventPlanner from "../components/EventPlanner";
 import RenderImage from "../components/RenderImage";
 import { catering, locations, ordering } from "../data/business";
 import renders from "../data/renders";
 import { telHref } from "../lib/hours";
 import { useSeo } from "../lib/seo";
 
-const london = (d: Date, opts: Intl.DateTimeFormatOptions) => new Intl.DateTimeFormat("en-GB", { timeZone: "Europe/London", ...opts }).format(d);
-
-/** "48 hours from now" in London time, for planning a collection. */
-function EarliestCollection() {
-  const [now] = useState(() => new Date());
-  const earliest = new Date(now.getTime() + catering.leadTimeHours * 3600_000);
-  return (
-    <div className="lead-card">
-      <Calendar />
-      <div>
-        <p className="lead-card-label">Ordering now? The earliest collection is around</p>
-        <p className="lead-card-date">
-          {london(earliest, { weekday: "long", day: "numeric", month: "long" })}, {london(earliest, { hour: "numeric", minute: "2-digit", hour12: true }).replace(" ", "")}
-        </p>
-        <p className="small">48 hours from now, within your shop's opening hours.</p>
-      </div>
-    </div>
-  );
-}
 
 /** Planning guide only — based on the published platter size and price. */
 function PlatterPlanner() {
@@ -112,7 +94,7 @@ export default function Catering() {
             <p>{catering.lastMinute}</p>
           </li>
         </ol>
-        <EarliestCollection />
+        <EventPlanner />
       </section>
 
       <section className="container section catering-menu">

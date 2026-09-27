@@ -7,6 +7,7 @@ import "./styles/pages.css";
 import { lazy, Suspense, useEffect, useLayoutEffect } from "react";
 import { Route, Routes, useLocation } from "react-router-dom";
 import Cursor from "./components/Cursor";
+import ScrollExtras from "./components/ScrollExtras";
 import Footer from "./components/Footer";
 import Header from "./components/Header";
 import OrderDialog from "./components/OrderDialog";
@@ -69,6 +70,7 @@ function Shell() {
       <Footer />
       <OrderDialog />
       <Cursor />
+      <ScrollExtras />
     </>
   );
 }
