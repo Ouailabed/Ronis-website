@@ -1,6 +1,6 @@
-import "@fontsource/instrument-serif/latin-400.css";
-import "@fontsource/instrument-serif/latin-400-italic.css";
-import "@fontsource-variable/instrument-sans/index.css";
+import "@fontsource-variable/archivo/wdth.css";
+import "@fontsource-variable/fraunces/full-italic.css";
+import "@fontsource-variable/fraunces/full.css";
 import "./styles/base.css";
 import "./styles/layout.css";
 import "./styles/home.css";

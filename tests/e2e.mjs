@@ -93,13 +93,13 @@ try {
   await page.goto(BASE + "/menu", { waitUntil: "networkidle" });
   await page.keyboard.press("Tab");
   ok((await page.evaluate(() => document.activeElement?.textContent)) === "Skip to content", "first Tab reaches the skip link");
-  const orderBtn = page.locator(".header-nav .btn");
+  const orderBtn = page.locator(".nav-order");
   await orderBtn.focus();
   await page.keyboard.press("Enter");
   await page.waitForTimeout(300);
   ok(await page.locator("dialog.order-dialog[open]").isVisible(), "Enter on “Order now” opens the order dialog");
   ok(await page.evaluate(() => !!document.activeElement?.closest("dialog")), "focus moves into the dialog");
-  await page.getByRole("button", { name: /Muswell Hill/ }).focus();
+  await page.locator("dialog").getByRole("button", { name: /Muswell Hill/ }).focus();
   await page.keyboard.press("Enter");
   await page.waitForTimeout(200);
   const optionHrefs = await page.locator(".order-options a").evaluateAll((as) => as.map((a) => a.getAttribute("href")));
@@ -107,7 +107,7 @@ try {
   ok(optionHrefs.includes("https://deliveroo.co.uk/menu/london/muswell-hill/ronis"), "Muswell Hill shows its own Deliveroo listing");
   ok(optionHrefs.includes("tel:+442088294999"), "Muswell Hill shows its phone number");
   await page.getByRole("button", { name: "Choose a different shop" }).click();
-  await page.getByRole("button", { name: /Swains Lane/ }).click();
+  await page.locator("dialog").getByRole("button", { name: /Swains Lane/ }).click();
   const swains = await page.locator(".order-options a").evaluateAll((as) => as.map((a) => a.getAttribute("href")));
   ok(!swains.some((h) => h.includes("deliveroo")), "Swains Lane (no Deliveroo listing) shows no delivery option");
   await page.keyboard.press("Escape");
@@ -140,51 +140,63 @@ try {
   ok(/less than 48 hours/i.test(await page.locator(".ep-result").innerText()), "event planner warns when the event is under 48 hours away");
   await page.close();
 
-  /* ------------------------------------------------ home: hero, menu hover, signature scroll */
+  /* ------------------------------------------------ home: hero, bagels, visit, scroll */
   const home = await browser.newPage({ viewport: { width: 1440, height: 900 } });
   await home.goto(BASE + "/", { waitUntil: "domcontentloaded" });
   ok(await home.locator(".hero").getByRole("button", { name: "Order now" }).isVisible(), "hero “Order now” is visible straight away");
-  ok(await home.locator(".hero").getByRole("link", { name: "View menu" }).isVisible(), "hero “View menu” is visible straight away");
+  ok(await home.locator(".nav-order").isVisible(), "the header Order button is always there");
   await home.waitForLoadState("networkidle");
-  ok(await home.locator(".hero-photo img").evaluate((i) => i.complete && i.naturalWidth > 0 && i.loading === "eager"), "hero photograph loads eagerly");
-  ok(/open now|closed right now/i.test(await home.locator(".hero-live").innerText()), "hero shows live opening status");
-  await home.locator("#menu").scrollIntoViewIfNeeded();
-  await home.locator(".menu-row").nth(2).hover();
-  await home.waitForTimeout(300);
-  ok((await home.locator(".menu-stage-photo").nth(2).getAttribute("class")).includes("is-active"), "hovering a menu item swaps the large photograph");
-  ok(/03 \/ 06/.test(await home.locator(".menu-stage-caption").innerText()), "menu photo caption follows the hovered item");
-  const clipAt = async () => home.locator(".sig-frame").evaluate((el) => getComputedStyle(el).clipPath);
-  await home.evaluate(() => window.scrollTo(0, document.querySelector(".sig-stage").getBoundingClientRect().top + window.scrollY - window.innerHeight * 0.8));
-  await home.waitForTimeout(900);
-  const clipStart = await clipAt();
-  await home.evaluate(() => window.scrollTo(0, document.querySelector(".sig-stage").getBoundingClientRect().top + window.scrollY - 40));
-  await home.waitForTimeout(1500);
-  const clipEnd = await clipAt();
-  ok(clipStart !== clipEnd && /^inset\(0(px|%)?( 0(px|%)?)*\)$/.test(clipEnd), `signature photo opens to full width on scroll (${clipStart} → ${clipEnd})`);
+  ok(await home.locator(".hero-frame img").evaluate((i) => i.complete && i.naturalWidth > 0 && i.loading === "eager"), "hero photograph loads eagerly");
+  ok(/open now|closed right now/i.test(await home.locator(".nav-live").innerText()), "header shows live opening status");
+  await home.locator("#bagels").scrollIntoViewIfNeeded();
+  await home.locator(".bagels-item").nth(2).hover();
+  await home.waitForTimeout(400);
+  ok((await home.locator(".bagels-photo").nth(2).getAttribute("class")).includes("is-active"), "pointing at a bagel swaps the large photograph");
+  ok(/03 \/ 07/.test(await home.locator(".bagels-count").innerText()), "photo counter follows the chosen item");
+  ok(/Tuna mix & cucumber/.test(await home.locator(".bagels-detail h3").innerText()), "name and description follow the chosen item");
+  await home.locator("#visit").scrollIntoViewIfNeeded();
+  await home.locator(".visit-tabs button", { hasText: "Muswell Hill" }).click();
+  ok(/348 Muswell Hill Broadway/.test(await home.locator(".visit-address").innerText()), "choosing a bakery shows its address");
+  ok(/Muswell/.test((await home.locator(".visit-actions a").first().getAttribute("href")) ?? ""), "Get directions points at the chosen bakery");
+  await home.evaluate(() => window.scrollTo(0, 0));
+  await home.waitForTimeout(600);
+  const clip0 = await home.locator(".hero-frame").evaluate((el) => getComputedStyle(el).clipPath);
+  await home.evaluate(() => window.scrollTo(0, window.innerHeight * 0.6));
+  await home.waitForTimeout(1200);
+  const clip1 = await home.locator(".hero-frame").evaluate((el) => getComputedStyle(el).clipPath);
+  ok(clip0 !== clip1, `hero photograph pulls in as the page scrolls (${clip0} → ${clip1})`);
   ok((await home.locator("canvas").count()) === 0, "no WebGL canvas on the page (photography only)");
   await home.close();
 
   /* ------------------------------------------------ reduced motion */
   const rm = await browser.newPage({ viewport: { width: 1280, height: 800 }, reducedMotion: "reduce" });
   await rm.goto(BASE + "/", { waitUntil: "networkidle" });
-  ok((await rm.locator(".sig-frame").evaluate((el) => getComputedStyle(el).clipPath)) === "none", "reduced motion: signature photo is simply full width");
-  ok((await rm.locator(".timeline li").first().evaluate((el) => getComputedStyle(el).opacity)) === "1", "reduced motion: content is visible without scroll animations");
-  ok((await rm.locator(".hero-photo").evaluate((el) => getComputedStyle(el).animationName)) === "none", "reduced motion: no hero intro animation");
+  ok((await rm.locator(".hero-frame .photo").evaluate((el) => getComputedStyle(el).animationName)) === "none", "reduced motion: no hero intro animation");
+  await rm.evaluate(() => window.scrollTo(0, window.innerHeight));
+  await rm.waitForTimeout(300);
+  ok((await rm.locator(".hero-frame").evaluate((el) => getComputedStyle(el).clipPath)) === "none", "reduced motion: no scroll-linked effects");
+  ok((await rm.locator(".bagels-head .line > span").first().evaluate((el) => getComputedStyle(el).transform)) === "none", "reduced motion: headlines are simply there");
   await rm.close();
 
   /* ------------------------------------------------ mobile */
   const m = await browser.newPage({ viewport: { width: 390, height: 844 }, isMobile: true, hasTouch: true });
   await m.goto(BASE + "/", { waitUntil: "networkidle" });
-  ok(await m.locator(".header-nav").getByRole("link", { name: "Menu" }).isVisible(), "mobile: header shows Menu");
-  ok(await m.locator(".header-nav").getByRole("button", { name: "Order" }).isVisible(), "mobile: header shows Order");
-  ok(!(await m.locator(".header-nav .nav-wide").first().isVisible()), "mobile: no crowded navigation");
-  const heroSrc = await m.locator(".hero-photo img").evaluate((i) => i.currentSrc);
-  ok(/hero-tall/.test(heroSrc), "mobile: hero uses the tall crop");
-  await m.locator(".menu-row").first().scrollIntoViewIfNeeded();
-  ok(await m.locator(".menu-row-photo").first().isVisible(), "mobile: each menu item shows its own photo");
-  ok(!(await m.locator(".menu-stage").isVisible()), "mobile: desktop hover stage is hidden");
+  ok(await m.locator(".nav-order").isVisible(), "mobile: header shows Order");
+  ok(!(await m.locator(".nav-links").isVisible()), "mobile: no crowded links in the bar");
+  ok(/hero-tall/.test(await m.locator(".hero-frame img").evaluate((i) => i.currentSrc)), "mobile: hero uses the tall crop");
+  await m.locator(".nav").getByRole("button", { name: "Menu" }).click();
+  ok(await m.locator("#site-menu").isVisible(), "mobile: Menu opens the full-screen menu");
+  await m.locator("#site-menu a", { hasText: "Location" }).click();
+  await m.waitForURL("**/locations");
+  await m.waitForTimeout(600);
+  ok(!(await m.locator("#site-menu").isVisible()), "mobile: choosing a page closes the menu");
+  await m.goto(BASE + "/", { waitUntil: "networkidle" });
+  await m.locator("#bagels").scrollIntoViewIfNeeded();
+  await m.locator(".bagels-item").nth(1).tap();
+  await m.waitForTimeout(300);
+  ok(/Hot salt beef/.test(await m.locator(".bagels-detail h3").innerText()), "mobile: tapping an item swaps the photo and details");
   const btnHeights = await m.locator(".btn").evaluateAll((bs) => bs.filter((b) => b.offsetParent).map((b) => b.getBoundingClientRect().height));
-  ok(btnHeights.every((hh) => hh >= 38), `mobile: buttons are comfortably tappable (min ${Math.min(...btnHeights).toFixed(0)}px)`);
+  ok(btnHeights.every((hh) => hh >= 40), `mobile: buttons are comfortably tappable (min ${Math.min(...btnHeights).toFixed(0)}px)`);
   await m.close();
 
   /* ------------------------------------------------ no horizontal overflow at any size */
@@ -210,7 +222,7 @@ try {
   const errors = [];
   p.on("pageerror", (e) => errors.push(e.message));
   await p.goto(BASE + "/", { waitUntil: "networkidle" });
-  ok(await p.locator(".hero-photo img").isVisible(), "no WebGL: hero photograph is shown");
+  ok(await p.locator(".hero-frame img").isVisible(), "no WebGL: hero photograph is shown");
   ok(errors.length === 0, "no WebGL: no page errors");
 } finally {
   await noGl.close();

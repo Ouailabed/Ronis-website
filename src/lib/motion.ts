@@ -33,3 +33,14 @@ export function lockScroll(locked: boolean) {
 }
 
 export { gsap, ScrollTrigger };
+
+/**
+ * Runs GSAP scroll effects for a section, only when motion is welcome, and cleans them up.
+ * `setup` receives gsap.matchMedia so effects can differ between phones and desktops.
+ */
+export function scrollFx(scope: HTMLElement | null, setup: (mm: gsap.MatchMedia, el: HTMLElement) => void) {
+  if (!scope || reducedMotion()) return () => {};
+  const mm = gsap.matchMedia(scope);
+  setup(mm, scope);
+  return () => mm.revert();
+}

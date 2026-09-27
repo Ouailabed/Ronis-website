@@ -1,28 +1,27 @@
-import Heritage from "../components/home/Heritage";
+import Bagels from "../components/home/Bagels";
+import FoodMoment from "../components/home/FoodMoment";
 import Hero from "../components/home/Hero";
-import HungryCta from "../components/home/HungryCta";
-import MenuIndex from "../components/home/MenuIndex";
-import ShopsIndex from "../components/home/ShopsIndex";
-import Signature from "../components/home/Signature";
+import OrderBlock from "../components/home/OrderBlock";
+import SeeYou from "../components/home/SeeYou";
+import Story from "../components/home/Story";
+import Visit from "../components/home/Visit";
 import { useSeo } from "../lib/seo";
 
 /**
- * Home: what Roni's is (hero) → why care (since 1989) → what to eat (menu) →
- * the signature bagel → where and when (visit) → how to order.
+ * Home: the campaign (hero) → since 1989 → the bagels → a food moment →
+ * what are you having? → where to find us → see you at Roni's.
  */
 export default function Home() {
-  useSeo(
-    "",
-    "Roni's Bagel Bakery: fresh bagels and Jewish baked goods in North London since 1989. Six bakeries — West Hampstead, Belsize Village, Hampstead, Swains Lane, Muswell Hill and Brent Cross. Order online.",
-  );
+  useSeo("", "Roni's Bagel Bakery: fresh bagels and Jewish baked goods in North London since 1989. Six bakeries — West Hampstead, Belsize Village, Hampstead, Swains Lane, Muswell Hill and Brent Cross. Order online.");
   return (
     <>
       <Hero />
-      <Heritage />
-      <MenuIndex />
-      <Signature />
-      <ShopsIndex />
-      <HungryCta />
+      <Story />
+      <Bagels />
+      <FoodMoment />
+      <OrderBlock />
+      <Visit />
+      <SeeYou />
     </>
   );
 }

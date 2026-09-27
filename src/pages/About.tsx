@@ -45,12 +45,13 @@ export default function About() {
             From one shop <em>to six.</em>
           </h2>
         </header>
-        <ol className="timeline">
-          {story.timeline.map((t, i) => (
-            <li key={t.year} className="reveal" style={{ ["--delay" as string]: `${i * 0.08}s` }}>
-              <span className="timeline-year">{t.year}</span>
-              <h3>{t.title}</h3>
-              <p className="small muted">{t.text}</p>
+        <ol className="story-years about-years">
+          {story.timeline.map((t) => (
+            <li key={t.year}>
+              <span className="story-years-y display tnum">{t.year}</span>
+              <span>
+                <strong>{t.title}.</strong> <span className="muted">{t.text}</span>
+              </span>
             </li>
           ))}
         </ol>

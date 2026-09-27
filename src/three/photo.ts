@@ -289,7 +289,10 @@ export function renderPhoto(canvas: HTMLCanvasElement, shot: PhotoShot, w: numbe
       // the sandwich close and low, bagels trailing off into the dark behind it. The wide frame keeps
       // the left third dark for the headline; the tall (phone) frame keeps the top dark instead.
       const tall = shot === "photo-hero-tall";
-      scene.add(deliPaper(6, 5, 4, -0.22));
+      // the paper sits under the sandwich only, so the left of the wide frame stays dark for type
+      const paper = deliPaper(tall ? 6 : 4.6, tall ? 5 : 4, 4, -0.22);
+      if (!tall) paper.position.x = 0.5;
+      scene.add(paper);
       add(createFilledBagel("salmon", { seed: 1989, tilt: 0.09 }), 0, 0, 0, 0.35);
       prop(77, "poppy", 3.0, -3.4, 1, "pale");
       prop(78, "sesame", -2.2, -4.6, 2);

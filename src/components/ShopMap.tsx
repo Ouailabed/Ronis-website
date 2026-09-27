@@ -9,7 +9,7 @@ const LABEL: Record<string, { dx: number; dy: number; anchor: "start" | "end" | 
   "west-hampstead": { dx: -14, dy: 16, anchor: "end" },
   "belsize-village": { dx: 14, dy: 18, anchor: "start" },
   hampstead: { dx: 14, dy: 0, anchor: "start" },
-  "swains-lane": { dx: 14, dy: 4, anchor: "start" },
+  "swains-lane": { dx: 0, dy: -18, anchor: "middle" },
   "muswell-hill": { dx: -14, dy: 4, anchor: "end" },
   "brent-cross": { dx: 14, dy: 4, anchor: "start" },
 };
@@ -30,7 +30,7 @@ export default function ShopMap({ active, onPick }: { active?: string | null; on
         <rect width={W} height={H} fill="url(#map-grid)" />
         {/* Hampstead Heath, roughly placed as a landmark */}
         <path className="map-heath" d="M214 150c22-18 70-20 98-4 18 11 13 40-4 55-22 20-66 22-88 7-18-13-22-42-6-58Z" />
-        <text className="map-area" x="236" y="186">
+        <text className="map-area" x="214" y="214">
           Hampstead Heath
         </text>
         {locations.map((l, i) => {

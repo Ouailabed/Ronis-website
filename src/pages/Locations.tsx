@@ -1,5 +1,5 @@
 import { Link } from "react-router-dom";
-import { ShopsBoard } from "../components/home/ShopsIndex";
+import Visit from "../components/home/Visit";
 import { ArrowRight } from "../components/Icons";
 import { LAST_CHECKED, locations } from "../data/business";
 import { fullAddress, hoursRows } from "../lib/hours";
@@ -37,12 +37,7 @@ export default function Locations() {
         </p>
       </header>
 
-      <section className="container" aria-labelledby="all-h">
-        <h2 id="all-h" className="visually-hidden">
-          All Roni's bakeries
-        </h2>
-        <ShopsBoard />
-      </section>
+      <Visit head={false} />
 
       <section className="container section hours-table-wrap" aria-labelledby="hours-h">
         <header className="sec-head">

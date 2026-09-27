@@ -1,43 +1,45 @@
 # Design notes
 
-The brief: Roni's should look like an established London food brand — part editorial food magazine, part contemporary bakery. Food is the hero; every section has to answer *what is Roni's, why care, what do I eat, where, when is it open, how do I order*.
+Roni's = London bagel institution × editorial food magazine × modern web. The site is built like a campaign: big food photography, poster type, one question per scene.
+
+## Audit (what was kept)
+
+- **Kept:** `src/data/business.ts` (every fact), `src/data/photos.ts` + `public/photos`, hours/open-now, nearest shop, order drawer logic, catering planners, SEO plugin, router, GSAP, the e2e suite.
+- **Replaced:** every visual component, all CSS, the fonts, the navigation, the home page composition.
+- **Not shipped:** three.js — used offline only to render the food images (`src/three/photo.ts`).
 
 ## System
 
-- **Colour:** paper `#f2ede3`, deep black `#141210`, and one accent — Roni's awning blue `#22418f` — used for ordering, the closing band, map pins and the years in the story. No gradients.
-- **Type:** Instrument Serif (headlines, item names, big numbers) and Instrument Sans (everything else). Small tracked capitals for labels.
-- **Grid:** 12 columns, hairline rules, numbered section labels (`01 — Since 1989`). Headlines are large only where they carry meaning (the hero, section heads, the closing line).
-- **Page rhythm (home):** dark photographic hero → paper (story, menu) → black (signature bagel) → paper (visit) → blue (order) → black footer.
+- **Colour:** crust-paper `#efe7d8`, espresso black `#16110d`, one accent — Roni's awning blue `#1f3f94`. No gradients.
+- **Type:** Archivo (variable width) set condensed, heavy and upper-case for poster headlines; Fraunces italic for the editorial voice ("done properly", "having?"); Archivo at normal width for reading.
+- **Shapes:** square blocks. Buttons are solid slabs whose fill wipes across on hover; no pills, no cards, photos run to the viewport edges.
 
-## Motion
+## Home, scene by scene
 
-Restrained, native scrolling, and optional:
-
-| Effect | Where | Fallback |
+| # | Scene | Motion (all off with reduced motion) |
 | --- | --- | --- |
-| Photo uncovers from the centre and settles from a slight zoom; headline rises line by line | Home hero, on load (CSS) | Reduced motion: shown straight away |
-| Hero photo drifts slower than the page | Home hero, desktop only (GSAP) | Off on phones and with reduced motion |
-| Headlines rise out of a mask; photos uncover upward | Section heads and some photos, on scroll (CSS + IntersectionObserver) | Reduced motion / no JS: shown straight away |
-| Hovering (or focusing) a menu item swaps the large photo | Home menu, desktop | Phones: every item has its own photo |
-| Framed photo opens out to full width and settles as you scroll | Home signature bagel (GSAP scrub) | Reduced motion: full width, static |
-| Page change: short fade-up | Every route | Reduced motion: none |
+| 01 | Campaign hero: "Roni's Bagels, *done properly.*", Order now | Photo rises like a curtain and settles; type lines rise; pointer drift (desktop); on scroll the photo pulls in at the edges onto the paper |
+| 02 | SINCE 1989 set across the page; photo + story + dates | The two words slide together; photo and text travel at different speeds |
+| 03 | The bagels: numbered list + one big photo, name/description/price beneath | New photo wipes up over the last one; phones get a swipe strip of names above the photo |
+| 04 | Food moment: one huge photo, "Fresh. *Simple.* Roni's." | Photo settles from a close crop; each word drifts at its own pace |
+| 05 | "What are you *having?*" — one enormous Order button + Collect / Delivery / Platters | Headline reveal only |
+| 06 | Visit: blue poster map, pick a bakery, address/today/hours/call, Get directions | Detail fades in on change |
+| 07 | "See you at Roni's." over a table of bagels | Photo settles as it scrolls in |
 
-The scroll test in `tests/e2e.mjs` checks the signature transition, the menu swap, reduced motion, mobile and no-WebGL behaviour. Scrolling was measured at a median 16.7 ms per frame.
+Navigation: wordmark, Menu / About / Location, and an Order block that never leaves — the bar tucks away while reading down and an Order tab stays in the corner. Phones get a designed full-screen menu.
 
-## WebGL: used offline, not on the page
+## ThreeUI references (open-source repo; threeui.com itself is blocked here, Kairo/Aurello are not in the repo)
 
-The food images are rendered with three.js (`src/three/photo.ts`) — but offline, into ordinary WebP files. The live site ships **no WebGL**: the earlier real-time 3D hero looked like a tech demo, added hundreds of kilobytes of JavaScript, and was behind most of the scrolling problems reported on the previous version. Photographs (and, until Roni's supplies them, photo-like renders) do the job better. The site is identical with WebGL disabled.
+| Need | Reference | What was taken |
+| --- | --- | --- |
+| Hero | **Kage** hero (mask-line reveal), **Sylva** hero (per-word delayed rise) | Curtain reveal + staggered line rise |
+| Hero | **Kairo** (culinary: product photography first, pinned editorial feel) | Food as the dominant visual, photo contracting on scroll instead of pinning |
+| Editorial layout | **Complete Shelf** (editorial header + index nav) | Numbered labels, index-style lists |
+| Editorial layout | **Meng To Sketchbook** (large "plates") | Full-bleed photographs as whole scenes |
+| Image transition | Kage `clip-path` reveals | Photo uncovering in the hero and bagels list |
+| Image transition | **Gallery** render loop discipline | Effects pause/revert cleanly; nothing runs off-screen |
+| Navigation | Kage nav | Minimal bar, one strong action |
+| Product interaction | **Bestsellers** (menu layer + detail panel) | Bagels list → big photo + detail |
+| Scroll interaction | **Aurello** (scroll-choreographed product, stills as fallback) | Scroll-linked scale/drift in 02, 04, 07; the stills are the whole experience |
 
-## ThreeUI — what was taken, what wasn't
-
-threeui.com itself was not reachable from the build environment, and the two culinary/product templates named in the brief (**Kairo**, **Aurello**) are not in the open-source repository ([MengTo/threeui](https://github.com/MengTo/threeui)), so those were studied from their published descriptions; everything else from the repo's source.
-
-| ThreeUI piece | What makes it good | Fits Roni's? | What happened |
-| --- | --- | --- | --- |
-| **Kage / Complete Shelf** landing pages: `mask-line` and `word-reveal` headline reveals, `data-rv="up"` fades, `cubic-bezier(.16,1,.3,1)` easing | Type that feels printed, arriving calmly | Yes | Adapted as `.reveal-lines` / `.reveal` in `base.css`, same easing |
-| **Kairo** (culinary product page): pinned editorial sections, remote product photography, ScrollTrigger reveals | Photography first; one product given the whole screen | Yes | The signature-bagel section: the photo opens to full width as you scroll. No pinning (it fights mobile scrolling) and no Lenis (it caused jank earlier) |
-| **Aurello**: a product travels through the page; original stills as the no-WebGL fallback | Stills that stand on their own | Partly | Kept the idea that the stills are the real experience; dropped the real-time 3D journey |
-| **Gallery** (rotating image cylinder) | Good render loop: pauses off-screen, one frame for reduced motion | Pattern yes, effect no | A spinning gallery says "tech demo". Its render-loop discipline informed the scroll code |
-| **Article Headings**: numbered entries with an index and meta line | Editorial list rhythm | Yes | The numbered home menu (`01 Smoked salmon & cream cheese…`) and the numbered shop list. Its text-scramble effect was left out |
-| **Newsletter footer** giant wordmark | Strong sign-off | No | Replaced by a minimal footer; the "Hungry? Come get your bagel." band is the sign-off |
-| Shaders, particle wordmarks, glass/gradient CTAs, preloaders, custom cursors | — | No | A bakery site shouldn't make you wait or look like a SaaS product |
+Rejected: shaders, particle wordmarks, glass/gradient CTAs, preloaders, custom cursors, live 3D.

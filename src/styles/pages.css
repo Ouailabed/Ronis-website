@@ -74,7 +74,7 @@
   min-height: 40px;
   padding: 0 16px;
   border: 1px solid var(--line);
-  border-radius: 999px;
+  border-radius: 0;
   background: transparent;
   font-size: 14px;
   font-weight: 500;
@@ -194,7 +194,7 @@ input[type="search"]:focus {
 .menu-search input {
   width: 100%;
   padding-left: 42px;
-  border-radius: 999px;
+  border-radius: 0;
   min-height: 42px;
 }
 .menu-tools .chips {
@@ -764,4 +764,14 @@ input[type="search"]:focus {
   min-width: 48px;
   justify-content: center;
   font-weight: 600;
+}
+.about-years {
+  max-width: 900px;
+  margin-left: auto;
+}
+.about-years li {
+  font-size: 17px;
+}
+.about-years .story-years-y {
+  font-size: clamp(40px, 4vw, 64px);
 }

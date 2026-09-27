@@ -1,6 +1,6 @@
 import { useMemo, useState } from "react";
 import { Link, useSearchParams } from "react-router-dom";
-import HungryCta from "../components/home/HungryCta";
+import OrderBlock from "../components/home/OrderBlock";
 import { ArrowRight, Search } from "../components/Icons";
 import Photo from "../components/Photo";
 import { menu, menuCategories, type MenuCategory } from "../data/business";
@@ -138,7 +138,7 @@ export default function Menu() {
         ))}
       </div>
 
-      <HungryCta />
+      <OrderBlock />
     </>
   );
 }
