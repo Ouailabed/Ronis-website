@@ -1,8 +1,8 @@
 import { useMemo, useState } from "react";
 import { Link, useSearchParams } from "react-router-dom";
-import { ArrowUpRight, Bag, Search } from "../components/Icons";
+import { Bag, Search } from "../components/Icons";
 import RenderImage from "../components/RenderImage";
-import { menu, menuCategories, ordering, type MenuCategory } from "../data/business";
+import { menu, menuCategories, type MenuCategory } from "../data/business";
 import renders from "../data/renders";
 import { useOrder } from "../lib/order";
 import { useSeo } from "../lib/seo";
@@ -127,16 +127,16 @@ export default function Menu() {
           <h2>
             Ready to <em>order?</em>
           </h2>
-          <p className="lede">Choose your Roni's, then order online for collection, get delivery where available, or give the shop a call.</p>
+          <p className="lede">Choose your Roni's, then call the shop to order for collection or get delivery where available. Prices are confirmed by the shop.</p>
         </div>
         <div className="menu-cta-actions">
           <button className="btn" onClick={() => openOrder()}>
             <Bag />
             Order now
           </button>
-          <a className="btn btn-ghost" href={ordering.online} target="_blank" rel="noopener">
-            Online ordering &amp; prices <ArrowUpRight />
-          </a>
+          <Link className="btn btn-ghost" to="/locations">
+            Find your Roni's
+          </Link>
         </div>
       </section>
     </>

@@ -601,3 +601,9 @@ a:hover .logo-mark {
     height: 46px;
   }
 }
+.order-note {
+  margin-top: 4px;
+  padding: 12px 14px;
+  border-left: 3px solid var(--gold, #b88f4a);
+  background: rgba(0, 0, 0, 0.04);
+}

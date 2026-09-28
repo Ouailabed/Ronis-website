@@ -1,10 +1,9 @@
 import { Link, useParams } from "react-router-dom";
-import { ArrowLeft, ArrowUpRight, Bag, Bike, Phone, Pin } from "../components/Icons";
+import { ArrowLeft, ArrowUpRight, Bike, Phone, Pin } from "../components/Icons";
 import CopyShare from "../components/CopyShare";
 import OpenStatus from "../components/OpenStatus";
-import RenderImage from "../components/RenderImage";
-import { LAST_CHECKED, locations, ordering } from "../data/business";
-import renders from "../data/renders";
+import ShopsMap from "../components/ShopsMap";
+import { LAST_CHECKED, locations } from "../data/business";
 import { appleMapsUrl, directionsUrl, fullAddress, hoursRows, openStatus, telHref } from "../lib/hours";
 import { useOrder } from "../lib/order";
 import { bakeryJsonLd, useSeo } from "../lib/seo";
@@ -80,15 +79,16 @@ export default function LocationDetail() {
           <h2 className="loc-panel-title">Order from {shop.name}</h2>
           <ul className="order-options">
             <li>
-              <a className="order-option" href={ordering.online} target="_blank" rel="noopener">
-                <Bag />
+              <a className="order-option" href={telHref(shop.phone)}>
+                <Phone />
                 <span>
-                  <strong>Order online for collection</strong>
-                  <span className="small">Roni's official online ordering.</span>
+                  <strong>Call {shop.phone} to order</strong>
+                  <span className="small">Order ahead for collection, or ask about today's bakes.</span>
                 </span>
                 <ArrowUpRight className="order-option-go" />
               </a>
             </li>
+
             {shop.deliveroo && (
               <li>
                 <a className="order-option" href={shop.deliveroo} target="_blank" rel="noopener">
@@ -101,23 +101,12 @@ export default function LocationDetail() {
                 </a>
               </li>
             )}
-            <li>
-              <a className="order-option" href={telHref(shop.phone)}>
-                <Phone />
-                <span>
-                  <strong>Call the shop</strong>
-                  <span className="small">For questions and last-minute orders.</span>
-                </span>
-                <ArrowUpRight className="order-option-go" />
-              </a>
-            </li>
+
           </ul>
           <button className="btn btn-ghost btn-small" onClick={() => openOrder(shop.slug)}>
             Open the order helper
           </button>
-          <div className="loc-art">
-            <RenderImage src={renders["bagels-trio"].src} width={renders["bagels-trio"].width} height={renders["bagels-trio"].height} alt="Illustration of three bagels: plain, sesame and poppy seed" />
-          </div>
+          <ShopsMap className="loc-map" only={[shop.slug]} selected={shop.slug} />
         </div>
       </section>
 

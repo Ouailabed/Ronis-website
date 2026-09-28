@@ -1194,3 +1194,77 @@
 .finder-item.is-selected .finder-km {
   color: var(--brass-soft);
 }
+
+/* ------------------------------------------------------------------ real street map */
+.shops-map {
+  position: relative;
+  border-radius: var(--radius-lg);
+  overflow: hidden;
+  box-shadow: inset 0 0 0 2px var(--ink);
+  background: #e9e5dc;
+  isolation: isolate;
+}
+.shops-map-canvas {
+  width: 100%;
+  aspect-ratio: 4 / 3;
+  min-height: 280px;
+  z-index: 0;
+}
+.finder-map.shops-map {
+  align-self: start;
+}
+.loc-map .shops-map-canvas {
+  aspect-ratio: 16 / 10;
+}
+.shops-map-fallback {
+  position: absolute;
+  inset: auto 12px 12px;
+  padding: 10px 12px;
+  background: var(--paper);
+  border-radius: 10px;
+}
+.shop-pin {
+  background: none;
+  border: 0;
+}
+.shop-pin span {
+  display: grid;
+  place-items: center;
+  width: 34px;
+  height: 34px;
+  border-radius: 50% 50% 50% 0;
+  transform: rotate(-45deg);
+  background: var(--bottle, #1d3a2f);
+  border: 2px solid var(--paper, #fbf8f1);
+  box-shadow: 0 4px 10px rgba(0, 0, 0, 0.35);
+  color: var(--paper, #fbf8f1);
+  font: 700 13px var(--sans);
+  transition: background-color 0.2s, transform 0.2s;
+}
+.shop-pin b {
+  transform: rotate(45deg);
+}
+.shop-pin.is-active span {
+  background: var(--stripe, #2b4c93);
+  transform: rotate(-45deg) scale(1.2);
+}
+.leaflet-container {
+  font-family: var(--sans);
+}
+.leaflet-popup-content {
+  font-size: 14px;
+  line-height: 1.45;
+}
+.finder-map.shops-map {
+  aspect-ratio: auto;
+}
+@media (max-width: 1100px) {
+  .finder-map .shops-map-canvas {
+    aspect-ratio: 16 / 9;
+  }
+}
+@media (max-width: 680px) {
+  .finder-map .shops-map-canvas {
+    aspect-ratio: 1;
+  }
+}

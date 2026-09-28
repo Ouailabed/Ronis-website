@@ -1,7 +1,7 @@
 import { useEffect, useRef } from "react";
 import { Link } from "react-router-dom";
 import { catering, locations, ordering } from "../data/business";
-import { fullAddress, openStatus, telHref } from "../lib/hours";
+import { directionsUrl, fullAddress, openStatus, telHref } from "../lib/hours";
 import { lockScroll } from "../lib/motion";
 import { useOrder } from "../lib/order";
 import { useLondonNow } from "../lib/useLondonNow";
@@ -85,9 +85,9 @@ export default function OrderDialog() {
               ))}
             </ul>
             <p className="order-foot small">
-              Know what you want?{" "}
+              {ordering.onlineOrderingLive ? "Know what you want? " : "Roni's own online ordering page isn't taking orders at the moment — "}
               <a href={ordering.online} target="_blank" rel="noopener" className="link-arrow">
-                Go straight to Roni's online ordering <ArrowUpRight className="icon-inline" />
+                {ordering.onlineOrderingLive ? "Go straight to Roni's online ordering" : "check it on ronisonline.co.uk"} <ArrowUpRight className="icon-inline" />
               </a>
             </p>
           </>
@@ -99,13 +99,13 @@ export default function OrderDialog() {
             </div>
             <ul className="order-options">
               <li>
-                <a className="order-option" href={ordering.online} target="_blank" rel="noopener">
-                  <Bag />
+                <a className="order-option" href={telHref(shop.phone)}>
+                  <Phone />
                   <span>
-                    <strong>Order online for collection</strong>
-                    <span className="small">Opens Roni's official online ordering on ronisonline.co.uk.</span>
+                    <strong>Call {shop.phone} to order</strong>
+                    <span className="small">Order for collection, ask about today's bakes, or place a last-minute order.</span>
                   </span>
-                  <ArrowUpRight className="order-option-go" />
+                  <ArrowRight className="order-option-go" />
                 </a>
               </li>
               {shop.deliveroo && (
@@ -121,16 +121,6 @@ export default function OrderDialog() {
                 </li>
               )}
               <li>
-                <a className="order-option" href={telHref(shop.phone)}>
-                  <Phone />
-                  <span>
-                    <strong>Call {shop.phone}</strong>
-                    <span className="small">Best for questions and last-minute orders.</span>
-                  </span>
-                  <ArrowRight className="order-option-go" />
-                </a>
-              </li>
-              <li>
                 <Link className="order-option" to="/catering" onClick={closeOrder}>
                   <Calendar />
                   <span>
@@ -140,7 +130,22 @@ export default function OrderDialog() {
                   <ArrowRight className="order-option-go" />
                 </Link>
               </li>
+              <li>
+                <a className="order-option" href={directionsUrl(shop)} target="_blank" rel="noopener">
+                  <Bag />
+                  <span>
+                    <strong>Walk in</strong>
+                    <span className="small">{fullAddress(shop)} — get directions.</span>
+                  </span>
+                  <ArrowUpRight className="order-option-go" />
+                </a>
+              </li>
             </ul>
+            {!ordering.onlineOrderingLive && (
+              <p className="small order-note">
+                Roni's online ordering page (ronisonline.co.uk) isn't taking orders at the moment, so calling the shop is the quickest way to order ahead.
+              </p>
+            )}
             <button className="btn btn-ghost btn-small order-back" onClick={() => setSlug(null)}>
               Choose a different shop
             </button>

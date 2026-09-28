@@ -19,11 +19,16 @@ Last checked: **September 2026**. The official site (ronisonline.co.uk) could no
 
 ## Ordering destinations (all official)
 
-- Online ordering: `https://www.ronisonline.co.uk/online-ordering` ("Online Orders (New)"). The older `/order-online` page says ordering there is no longer available, so it is **not** used.
+- Online ordering: `https://www.ronisonline.co.uk/online-ordering` ("Online Orders (New)"). ❓ **September 2026: the page says it is "Not Accepting Orders"**, so the site now puts "call the shop" and Deliveroo first and only mentions the online page as a fallback. When Roni's turns it back on, set `ordering.onlineOrderingLive = true` in `src/data/business.ts`. The older `/order-online` page says ordering there is no longer available, so it is **not** used.
 - Catering: `https://www.ronisonline.co.uk/catering`
 - Platters menu: `https://www.ronisonline.co.uk/menu?menu=platters`
 - Cakes and occasions: `https://www.ronisonline.co.uk/order-for-any-occasion`
 - Feedback: `https://www.ronisonline.co.uk/review`
+
+## Map
+
+- The Locations page and every shop page show a real street map (OpenStreetMap data, CARTO tiles, Leaflet), loaded only when it scrolls into view.
+- Pins are placed from each address (`approx` in `business.ts`); ❓ confirm each pin sits on the right shopfront and nudge the numbers if not. Directions buttons always use the full address.
 
 ## Catering
 

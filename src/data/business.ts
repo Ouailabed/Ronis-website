@@ -29,8 +29,12 @@ export const brand = {
  * ORDERING DESTINATIONS (all verified live pages on Roni's official site)
  * ------------------------------------------------------------------------- */
 export const ordering = {
-  /** Roni's official online ordering ("Online Orders (New)") */
+  /** Roni's official online ordering ("Online Orders (New)").
+   *  Checked September 2026: the page says it is NOT accepting orders, so the site
+   *  sends people to phone / Deliveroo first and only mentions this as a fallback.
+   *  Set onlineOrderingLive to true when Roni's switches it back on. */
   online: "https://www.ronisonline.co.uk/online-ordering",
+  onlineOrderingLive: false,
   /** Official catering page: platters, 48-hour notice, collect in store */
   catering: "https://www.ronisonline.co.uk/catering",
   /** Official platters menu */
@@ -68,8 +72,9 @@ export const catering = {
  * LOCATIONS
  *  hours: 24-hour times. close "24:00" = midnight.
  *  deliveroo: Roni's own listing for that shop (delivery), or "" if none.
- *  approx: rough map position for the schematic finder ONLY (not for
- *          navigation — the Directions buttons use the address).
+ *  approx: pin position on the street map, placed from the address (street
+ *          level, not door level). Directions buttons always use the address.
+ *          Adjust a pin by editing these numbers.
  * ------------------------------------------------------------------------- */
 export type Hours = { days: string; open: string; close: string };
 
@@ -110,7 +115,7 @@ export const locations: Location[] = [
     hours: [{ days: "Mon-Sun", open: "07:00", close: "18:00" }],
     opened: "Opened 2011",
     deliveroo: "https://deliveroo.co.uk/menu/london/belsize-park/ronis-belsize",
-    approx: { lat: 51.5503, lng: -0.1708 },
+    approx: { lat: 51.5505, lng: -0.1703 },
   },
   {
     slug: "hampstead",
@@ -122,7 +127,7 @@ export const locations: Location[] = [
     hours: [{ days: "Mon-Sun", open: "07:00", close: "20:00" }],
     opened: "Opened 2013",
     deliveroo: "https://deliveroo.co.uk/menu/london/hampstead/ronis-hampstead",
-    approx: { lat: 51.5541, lng: -0.1712 },
+    approx: { lat: 51.5547, lng: -0.1717 },
   },
   {
     slug: "swains-lane",
@@ -133,7 +138,7 @@ export const locations: Location[] = [
     phone: "020 8340 4404",
     hours: [{ days: "Mon-Sun", open: "07:00", close: "18:00" }],
     deliveroo: "",
-    approx: { lat: 51.5627, lng: -0.1472 },
+    approx: { lat: 51.5603, lng: -0.1467 },
   },
   {
     slug: "muswell-hill",

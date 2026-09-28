@@ -64,11 +64,11 @@ export default function Catering() {
           <p className="lede">Mini bagel platters, hot platters and mini desserts — ordered online and collected from your chosen Roni's.</p>
           <div className="hero-actions">
             <a className="btn" href={ordering.catering} target="_blank" rel="noopener">
-              Order catering online <ArrowUpRight />
+              Order catering on ronisonline.co.uk <ArrowUpRight />
             </a>
-            <a className="btn btn-ghost" href={ordering.plattersMenu} target="_blank" rel="noopener">
-              See the platters menu <ArrowUpRight />
-            </a>
+            <Link className="btn btn-ghost" to="/menu?category=platters">
+              See the platters menu
+            </Link>
           </div>
         </div>
         <div className="page-hero-art">

@@ -48,9 +48,7 @@ export default function Footer() {
               </button>
             </li>
             <li>
-              <a href={ordering.online} target="_blank" rel="noopener">
-                Online ordering <ArrowUpRight className="icon-inline" />
-              </a>
+              <Link to="/contact">Order by phone</Link>
             </li>
             <li>
               <Link to="/catering">Catering & platters</Link>

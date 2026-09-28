@@ -21,7 +21,16 @@ const ALLOWED_EXTERNAL = [
   /^https:\/\/maps\.apple\.com\/\?q=/,
   /^https:\/\/www\.instagram\.com\/ronisbb\/$/,
   /^https:\/\/www\.facebook\.com\/Ronisbakery\/$/,
+  // map credits
+  /^https:\/\/www\.openstreetmap\.org\/copyright$/,
+  /^https:\/\/carto\.com\/attributions$/,
+  /^https:\/\/leafletjs\.com$/,
 ];
+
+// Map tiles come from CARTO's CDN in real browsers; in CI they're swapped for a blank tile
+// so the checks don't depend on outside network access.
+const TILE = Buffer.from("iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAYAAAAfFcSJAAAADUlEQVR42mP8+vXrfwAJpAPi7F6o6wAAAABJRU5ErkJggg==", "base64");
+const stubTiles = (ctx) => ctx.route(/basemaps\.cartocdn\.com/, (r) => r.fulfill({ body: TILE, contentType: "image/png" }));
 
 let failures = 0;
 const ok = (cond, msg) => {
@@ -38,6 +47,12 @@ for (let i = 0; i < 100; i += 1) {
 }
 
 const browser = await chromium.launch({ executablePath: EXE, args: ["--use-angle=swiftshader", "--enable-unsafe-swiftshader"] });
+const _newPage = browser.newPage.bind(browser);
+browser.newPage = async (...a) => {
+  const pg = await _newPage(...a);
+  await stubTiles(pg);
+  return pg;
+};
 try {
   /* ------------------------------------------------ every page renders, no errors, no broken images */
   const internal = new Set();
@@ -103,9 +118,9 @@ try {
   await page.keyboard.press("Enter");
   await page.waitForTimeout(200);
   const optionHrefs = await page.locator(".order-options a").evaluateAll((as) => as.map((a) => a.getAttribute("href")));
-  ok(optionHrefs.includes("https://www.ronisonline.co.uk/online-ordering"), "shop options include Roni's official online ordering");
+  ok(optionHrefs[0] === "tel:+442088294999", "the first way to order is calling that shop");
   ok(optionHrefs.includes("https://deliveroo.co.uk/menu/london/muswell-hill/ronis"), "Muswell Hill shows its own Deliveroo listing");
-  ok(optionHrefs.includes("tel:+442088294999"), "Muswell Hill shows its phone number");
+  ok(!optionHrefs.includes("https://www.ronisonline.co.uk/online-ordering"), "no main option sends people to the paused online ordering page");
   await page.getByRole("button", { name: "Choose a different shop" }).click();
   await page.getByRole("button", { name: /Swains Lane/ }).click();
   const swains = await page.locator(".order-options a").evaluateAll((as) => as.map((a) => a.getAttribute("href")));
